@@ -1,3 +1,9 @@
+/*
+ * Erick Daniel Corona Garcia D03.
+ * 
+ * Modificado para Practica 1.
+ */
+
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;
 
 import java.io.BufferedReader;
@@ -15,66 +21,93 @@ import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
 
 public class ProcesoServidor extends Proceso{
-	private String m_message;
+	public static final int INDEX_STATUS =     0;
+	public static final int INDEX_MESSLENGTH = 1;
+	public static final int INDEX_MESSAGE =    2;
+
+	public static final int STATUS_SUC_READ =   0;
+	public static final int STATUS_SUC_WRITE =  1;
+	public static final int STATUS_SUC_CREATE = 2;
+	public static final int STATUS_SUC_DELETE = 3;
+	public static final int STATUS_ERR_READ =   4;
+	public static final int STATUS_ERR_WRITE =  5;
+	public static final int STATUS_ERR_CREATE = 6;
+	public static final int STATUS_ERR_DELETE = 7;
+	
+	public static final int SIZE_PACKET = 1024;
+	
+	private String m_requestMessage;
+	private String m_responseMessage;
+	private byte[] m_response;
+	private byte[] m_request;
+	private int    m_status;
 
 	public ProcesoServidor(Escribano esc){
 		super(esc);
+		
 		start();
 	}
 
-	public void run(){
+	public void run() {
 		imprimeln("Proceso servidor en ejecucion.");
-		byte[] solServidor=new byte[ProcesoCliente.SIZE_REQPACKET];
-		byte[] respServidor = new byte[ProcesoCliente.SIZE_REPPACKET];
-		byte dato;
-		while(continuar()){
-			Nucleo.receive(dameID(),solServidor);
+		m_request = new byte[ProcesoCliente.SIZE_PACKET];
+		m_response = new byte[SIZE_PACKET];
+
+		String fileName;
+		String argument;
+		while(continuar()) {
+			Nucleo.receive(dameID(),m_request);
 			
-			dato=solServidor[0];
-			imprimeln("El cliente envio un "+ dato);
+			m_requestMessage = new String(m_request, 
+					ProcesoCliente.INDEX_MESSAGE, 
+					(int)m_request[ProcesoCliente.INDEX_MESSAGELENGTH]);
 			
-			m_message = new String(solServidor, ProcesoCliente.INDEX_MESSAGE, 
-					(int)solServidor[ProcesoCliente.INDEX_MESSAGELENGTH]);
-			switch (solServidor[ProcesoCliente.INDEX_CODOP]) {
+			switch (m_request[ProcesoCliente.INDEX_CODOP]) {
 			case ClienteFrame.CODOP_CREATE :
-				imprimeln("Creando archivo: " + m_message);
+				imprimeln("Creando archivo: " + m_requestMessage);
 				createFile();
 				break;
 			case ClienteFrame.CODOP_DELETE :
-				imprimeln("Eliminando archivo: " + m_message);
+				imprimeln("Eliminando archivo: " + m_requestMessage);
 				deleteFile();
 				break;
 			case ClienteFrame.CODOP_WRITE :
-				imprimeln("Escribiendo archivo: " + m_message);
-				writeToFile("Hola Perro");
+				fileName = m_requestMessage.split(":")[0];
+				argument = m_requestMessage.split(":")[1];
+				imprimeln("Escribiendo archivo: " + fileName);
+				writeToFile(fileName, argument);
 				break;
 			case ClienteFrame.CODOP_READ :
-				imprimeln("Leyendo archivo: " + m_message);
-				imprimeln("Contenido: " + readFromFile());
+				fileName = m_requestMessage.split(":")[0];
+				argument = m_requestMessage.split(":")[1];
+				imprimeln("Leyendo archivo: " + fileName);
+				m_responseMessage = readFromFile(fileName, 
+						                         Integer.parseInt(argument));
 				break;
 			default :
 				imprimeln("Codigo de operacion invalido");
 				break;
 			}
-			respServidor=new byte[20];
-			respServidor[0]=(byte)(dato*dato);
 			
 			// avoid server's send() before client's receive()
 			Pausador.pausa(1000);
-			imprimeln("enviando respuesta");
-			Nucleo.send(0,respServidor);
+			imprimeln("Enviando respuesta");
+			pack();
+			Nucleo.send(0, m_response);
 		}
 	}
 	
 	private void createFile() {
-		String fileName = m_message;
+		String fileName = m_requestMessage;
 		try {
 			imprimeln("Nombre archivo " + fileName);
-			File myFile = new File(m_message);
+			File myFile = new File(m_requestMessage);
 			if (myFile.createNewFile()) {
+				m_status = STATUS_SUC_CREATE;
 				imprimeln("Archivo creado!");
 			}
 			else {
+				m_status = STATUS_ERR_CREATE;
 				imprimeln("Error creando archivo!");
 			}
 		}
@@ -84,14 +117,16 @@ public class ProcesoServidor extends Proceso{
 	}
 	
 	private void deleteFile() {
-		String fileName = m_message;
+		String fileName = m_requestMessage;
 		try {
 			File myFile = new File(fileName);
 			if ( myFile.delete() ) {
-				imprimeln("Archivo creado!");
+				m_status = STATUS_SUC_DELETE;
+				imprimeln("Archivo eliminado!");
 			}
 			else {
-				imprimeln("Error creando archivo!");
+				m_status = STATUS_ERR_DELETE;
+				imprimeln("Error eliminando archivo!");
 			}
 		}
 		catch (SecurityException ioe ) {
@@ -99,31 +134,60 @@ public class ProcesoServidor extends Proceso{
 		}
 	}
 	
-	private String readFromFile() {
-		String fileName = m_message;
+	private String readFromFile(String fileName, int lineNo) {
 		String contents = null;
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(fileName));
 			String line;
-			while ((line = in.readLine()) != null)
-				contents += line + "\n";
+			int i = 1;
+			while ((line = in.readLine()) != null) {
+				if (lineNo == i) {
+					contents = line + "\n";
+				}
+				++i;
+			}
 			in.close();
 		} catch (FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
+		
+		if (contents == null) {
+			m_status = STATUS_ERR_READ;
+		}
+		else {
+			m_status = STATUS_SUC_READ;
+		}
+		
 		return contents;
 	}
 
-	private void writeToFile(String contents) {
-		String fileName = m_message;
+	private void writeToFile(String fileName, String contents) {
 		try {
 			PrintWriter out = new PrintWriter(fileName);
 			out.print(contents);
 			out.close();
+			m_status = STATUS_SUC_WRITE;
 		} catch (FileNotFoundException fnfe) {
+			m_status = STATUS_ERR_WRITE;
 			fnfe.printStackTrace();
+		}
+	}
+	
+	private void pack() {
+		m_response[INDEX_STATUS] = (byte)m_status;
+		
+		if (m_responseMessage != null) {
+			byte[] messageBytes = m_responseMessage.getBytes();
+			int messageLength = messageBytes.length;
+			m_response[INDEX_MESSLENGTH] = (byte)messageLength;
+			for (int i = 0; i < messageLength; ++i) {
+				m_response[INDEX_MESSAGE + i] = messageBytes[i];
+			}
+		}
+		else {
+			m_response[INDEX_MESSLENGTH] = 0;
 		}
 	}
 }
