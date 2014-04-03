@@ -18,8 +18,10 @@ public class ProcesoCliente extends Proceso{
 	
 	public static final int SIZE_PACKET = 1024;
 	
-	private byte   m_codop;
+	private byte   m_opcode;
 	private String m_message;
+	private byte[] m_request;
+	private byte[] m_response;
 	
 	public ProcesoCliente(Escribano esc){
 		super(esc);
@@ -27,7 +29,7 @@ public class ProcesoCliente extends Proceso{
 	}
 	
 	public void setCodop(int codop) {
-		m_codop = (byte)codop;
+		m_opcode = (byte)codop;
 	}
 	
 	public void setMessage(String message) {
@@ -39,18 +41,18 @@ public class ProcesoCliente extends Proceso{
 		imprimeln("Esperando datos para continuar.");
 		Nucleo.suspenderProceso();
 
-		byte[] solCliente =new byte[SIZE_PACKET];
-		byte[] respCliente =new byte[ProcesoServidor.SIZE_PACKET];
+		m_request = new byte[SIZE_PACKET];
+		m_response = new byte[ProcesoServidor.SIZE_PACKET];
 
-		solCliente[INDEX_CODOP] = m_codop;
-		solCliente[INDEX_MESSAGELENGTH] = (byte)m_message.length();
+		m_request[INDEX_CODOP] = m_opcode;
+		m_request[INDEX_MESSAGELENGTH] = (byte)m_message.length();
 		
-		packMessage(solCliente);
+		packMessage();
 		
-		Nucleo.send(248,solCliente);
-		Nucleo.receive(dameID(), respCliente);
+		Nucleo.send(248,m_request);
+		Nucleo.receive(dameID(), m_response);
 		
-		switch (respCliente[ProcesoServidor.INDEX_STATUS]) {
+		switch (m_response[ProcesoServidor.INDEX_STATUS]) {
 		case ProcesoServidor.STATUS_SUC_CREATE :
 			imprimeln("Creacion exitosa");
 			break;
@@ -59,9 +61,9 @@ public class ProcesoCliente extends Proceso{
 			break;
 		case ProcesoServidor.STATUS_SUC_READ :
 			imprimeln("Lectura exitosa");
-			imprimeln("Contenido: " + new String(respCliente, 
+			imprimeln("Contenido: " + new String(m_response, 
 					ProcesoServidor.INDEX_MESSAGE, 
-					(int)respCliente[ProcesoServidor.INDEX_MESSLENGTH]));
+					(int)m_response[ProcesoServidor.INDEX_MESSLENGTH]));
 			break;
 		case ProcesoServidor.STATUS_SUC_WRITE :
 			imprimeln("Escritura exitosa");
@@ -81,9 +83,9 @@ public class ProcesoCliente extends Proceso{
 		}
 	}
 
-	private void packMessage(byte[] packet) {
-		byte[] array = m_message.getBytes();
-		for (int i = 0; i < array.length; ++i)
-			packet[INDEX_MESSAGE + i] = array[i];
+	private void packMessage() {
+		byte[] messageBytes = m_message.getBytes();
+		for (int i = 0; i < messageBytes.length; ++i)
+			m_request[INDEX_MESSAGE + i] = messageBytes[i];
 	}
 }
