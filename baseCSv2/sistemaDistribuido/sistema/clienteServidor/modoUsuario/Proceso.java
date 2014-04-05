@@ -1,3 +1,9 @@
+/*
+ * Erick Daniel Corona Garcia D03.
+ * 
+ * Modificado para Practica 1.
+ */
+
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;
 
 
@@ -11,6 +17,9 @@ import sistemaDistribuido.util.Escribano;
  */
 public abstract class Proceso extends SystemProcess{
 	protected MicroNucleo nucleo;
+	
+	protected byte[] m_request;
+	protected byte[] m_response;
 
 	/**
 	 * 
@@ -62,13 +71,13 @@ public abstract class Proceso extends SystemProcess{
 	}
 
 	/**
-	 * Actividad normal del proceso mientras está activo
+	 * Actividad normal del proceso mientras estï¿½ activo
 	 */
 	public void run(){
 	}
 
 	/**
-	 * Actividades a realizar tras recibir la señal de terminación del proceso
+	 * Actividades a realizar tras recibir la seï¿½al de terminaciï¿½n del proceso
 	 */
 	protected void shutdown(){
 		terminar();

@@ -10,28 +10,27 @@ import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
 
-
-public class ProcesoCliente extends Proceso{
-	public static final int INDEX_CODOP =          9;
+public class ProcesoCliente extends Proceso {
+	public static final int INDEX_OPCODE =         9;
 	public static final int INDEX_MESSAGELENGTH = 10;
 	public static final int INDEX_MESSAGE =       11;
-	
+
 	public static final int SIZE_PACKET = 1024;
-	
-	private byte   m_opcode;
+
+	private static final int PID_DEFAULT_DESTINY = 248;
+
+	private byte m_opcode;
 	private String m_message;
-	private byte[] m_request;
-	private byte[] m_response;
-	
-	public ProcesoCliente(Escribano esc){
+
+	public ProcesoCliente(Escribano esc) {
 		super(esc);
 		start();
 	}
-	
-	public void setCodop(int codop) {
-		m_opcode = (byte)codop;
+
+	public void setCodop(int opcode) {
+		m_opcode = (byte)opcode;
 	}
-	
+
 	public void setMessage(String message) {
 		m_message = message;
 	}
@@ -44,40 +43,40 @@ public class ProcesoCliente extends Proceso{
 		m_request = new byte[SIZE_PACKET];
 		m_response = new byte[ProcesoServidor.SIZE_PACKET];
 
-		m_request[INDEX_CODOP] = m_opcode;
-		m_request[INDEX_MESSAGELENGTH] = (byte)m_message.length();
-		
+		m_request[INDEX_OPCODE] = m_opcode;
+		m_request[INDEX_MESSAGELENGTH] = (byte) m_message.length();
+
 		packMessage();
-		
-		Nucleo.send(248,m_request);
+
+		Nucleo.send(PID_DEFAULT_DESTINY, m_request);
 		Nucleo.receive(dameID(), m_response);
-		
+
 		switch (m_response[ProcesoServidor.INDEX_STATUS]) {
-		case ProcesoServidor.STATUS_SUC_CREATE :
+		case ProcesoServidor.STATUS_SUC_CREATE:
 			imprimeln("Creacion exitosa");
 			break;
-		case ProcesoServidor.STATUS_SUC_DELETE :
+		case ProcesoServidor.STATUS_SUC_DELETE:
 			imprimeln("Eliminacion exitosa");
 			break;
-		case ProcesoServidor.STATUS_SUC_READ :
+		case ProcesoServidor.STATUS_SUC_READ:
 			imprimeln("Lectura exitosa");
-			imprimeln("Contenido: " + new String(m_response, 
-					ProcesoServidor.INDEX_MESSAGE, 
+			imprimeln("Contenido: " + 
+					new String(m_response, ProcesoServidor.INDEX_MESSAGE,
 					(int)m_response[ProcesoServidor.INDEX_MESSLENGTH]));
 			break;
-		case ProcesoServidor.STATUS_SUC_WRITE :
+		case ProcesoServidor.STATUS_SUC_WRITE:
 			imprimeln("Escritura exitosa");
 			break;
-		case ProcesoServidor.STATUS_ERR_CREATE :
+		case ProcesoServidor.STATUS_ERR_CREATE:
 			imprimeln("Error al leer el archivo");
 			break;
-		case ProcesoServidor.STATUS_ERR_DELETE :
+		case ProcesoServidor.STATUS_ERR_DELETE:
 			imprimeln("Error al eliminar en archivo");
 			break;
-		case ProcesoServidor.STATUS_ERR_READ :
+		case ProcesoServidor.STATUS_ERR_READ:
 			imprimeln("Error al leer archivo");
 			break;
-		case ProcesoServidor.STATUS_ERR_WRITE :
+		case ProcesoServidor.STATUS_ERR_WRITE:
 			imprimeln("Error al elcribir el archivo");
 			break;
 		}

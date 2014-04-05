@@ -20,7 +20,7 @@ import sistemaDistribuido.util.Pausador;
 import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
 
-public class ProcesoServidor extends Proceso{
+public class ProcesoServidor extends Proceso {
 	public static final int INDEX_STATUS =     0;
 	public static final int INDEX_MESSLENGTH = 1;
 	public static final int INDEX_MESSAGE =    2;
@@ -38,8 +38,6 @@ public class ProcesoServidor extends Proceso{
 	
 	private String m_requestMessage;
 	private String m_responseMessage;
-	private byte[] m_response;
-	private byte[] m_request;
 	private int    m_status;
 
 	public ProcesoServidor(Escribano esc){
@@ -62,7 +60,7 @@ public class ProcesoServidor extends Proceso{
 					ProcesoCliente.INDEX_MESSAGE, 
 					(int)m_request[ProcesoCliente.INDEX_MESSAGELENGTH]);
 			
-			switch (m_request[ProcesoCliente.INDEX_CODOP]) {
+			switch (m_request[ProcesoCliente.INDEX_OPCODE]) {
 			case ClienteFrame.CODOP_CREATE :
 				imprimeln("Creando archivo: " + m_requestMessage);
 				createFile();
@@ -115,7 +113,6 @@ public class ProcesoServidor extends Proceso{
 			ioe.printStackTrace();
 		}
 	}
-	
 	private void deleteFile() {
 		String fileName = m_requestMessage;
 		try {
@@ -133,7 +130,6 @@ public class ProcesoServidor extends Proceso{
 			ioe.printStackTrace();
 		}
 	}
-	
 	private String readFromFile(String fileName, int lineNo) {
 		String contents = null;
 		try {
@@ -162,7 +158,6 @@ public class ProcesoServidor extends Proceso{
 		
 		return contents;
 	}
-
 	private void writeToFile(String fileName, String contents) {
 		try {
 			PrintWriter out = new PrintWriter(fileName);
@@ -174,7 +169,7 @@ public class ProcesoServidor extends Proceso{
 			fnfe.printStackTrace();
 		}
 	}
-	
+
 	private void pack() {
 		m_response[INDEX_STATUS] = (byte)m_status;
 		
