@@ -43,36 +43,38 @@ public class ProcesoServidor extends Proceso {
 	public ProcesoServidor(Escribano esc){
 		super(esc);
 		
+		imprimeln("Inicio de proceso...");
 		start();
 	}
 
 	public void run() {
-		imprimeln("Proceso servidor en ejecucion.");
 		m_request = new byte[ProcesoCliente.SIZE_PACKET];
 		m_response = new byte[SIZE_PACKET];
 
 		String fileName;
 		String argument;
 		while(continuar()) {
+			imprimeln("Invocando a receive...");
 			Nucleo.receive(dameID(),m_request);
 			
+			imprimeln("Procesando peticion recibida del cliente...");
 			m_requestMessage = new String(m_request, 
 					ProcesoCliente.INDEX_MESSAGE, 
 					(int)m_request[ProcesoCliente.INDEX_MESSAGELENGTH]);
 			
 			switch (m_request[ProcesoCliente.INDEX_OPCODE]) {
 			case ClienteFrame.CODOP_CREATE :
-				imprimeln("Creando archivo: " + m_requestMessage);
+				imprimeln("Creando archivo: " + m_requestMessage + "...");
 				createFile();
 				break;
 			case ClienteFrame.CODOP_DELETE :
-				imprimeln("Eliminando archivo: " + m_requestMessage);
+				imprimeln("Eliminando archivo: " + m_requestMessage + "...");
 				deleteFile();
 				break;
 			case ClienteFrame.CODOP_WRITE :
 				fileName = m_requestMessage.split(":")[0];
 				argument = m_requestMessage.split(":")[1];
-				imprimeln("Escribiendo archivo: " + fileName);
+				imprimeln("Escribiendo archivo: " + fileName + "...");
 				writeToFile(fileName, argument);
 				break;
 			case ClienteFrame.CODOP_READ :
@@ -86,11 +88,14 @@ public class ProcesoServidor extends Proceso {
 				imprimeln("Codigo de operacion invalido");
 				break;
 			}
-			
+
+			imprimeln("Generando mensaje a ser enviado," +
+					  " llenando los campos necesarios...");
+			pack();
+
+			imprimeln("Senhalamiento al nucleo para envio de mensaje...");
 			// avoid server's send() before client's receive()
 			Pausador.pausa(1000);
-			imprimeln("Enviando respuesta");
-			pack();
 			Nucleo.send(0, m_response);
 		}
 	}

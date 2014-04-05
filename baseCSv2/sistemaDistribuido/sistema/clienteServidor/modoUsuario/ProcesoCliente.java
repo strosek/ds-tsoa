@@ -24,6 +24,8 @@ public class ProcesoCliente extends Proceso {
 
 	public ProcesoCliente(Escribano esc) {
 		super(esc);
+		
+		imprimeln("Inicio de proceso...");
 		start();
 	}
 
@@ -36,8 +38,8 @@ public class ProcesoCliente extends Proceso {
 	}
 
 	public void run() {
-		imprimeln("Proceso cliente en ejecucion.");
-		imprimeln("Esperando datos para continuar.");
+		imprimeln("Proceso cliente en ejecucion, " +
+				  "esperando datos para continuar...");
 		Nucleo.suspenderProceso();
 
 		m_request = new byte[SIZE_PACKET];
@@ -46,11 +48,17 @@ public class ProcesoCliente extends Proceso {
 		m_request[INDEX_OPCODE] = m_opcode;
 		m_request[INDEX_MESSAGELENGTH] = (byte) m_message.length();
 
+		imprimeln("Generando mensaje a ser enviado," +
+				  " llenando los campos necesarios...");
 		packMessage();
 
+		imprimeln("Senhalamiento al nucleo para envio de mensaje...");
 		Nucleo.send(PID_DEFAULT_DESTINY, m_request);
+		
+		imprimeln("Invocando a receive...");
 		Nucleo.receive(dameID(), m_response);
 
+		imprimeln("Procesando respuesta recibida del sevidor...");
 		switch (m_response[ProcesoServidor.INDEX_STATUS]) {
 		case ProcesoServidor.STATUS_SUC_CREATE:
 			imprimeln("Creacion exitosa");
