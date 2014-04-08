@@ -1,7 +1,7 @@
 /*
- * Erick Daniel Corona Garcia D03.
+ * Erick Daniel Corona Garcia 210224314. TSOA D03.
  * 
- * Modificado para Practica 1.
+ * Modificado para Practica 2.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;

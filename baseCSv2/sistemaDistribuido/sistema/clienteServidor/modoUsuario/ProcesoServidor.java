@@ -1,7 +1,7 @@
 /*
- * Erick Daniel Corona Garcia D03.
+ * Erick Daniel Corona Garcia 210224314. TSOA D03.
  * 
- * Modificado para Practica 1.
+ * Modificado para Practica 2.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;
@@ -40,7 +40,7 @@ public class ProcesoServidor extends Proceso {
 	private String m_responseMessage;
 	private int    m_status;
 
-	public ProcesoServidor(Escribano esc){
+	public ProcesoServidor(Escribano esc) {
 		super(esc);
 		
 		imprimeln("Inicio de proceso...");
