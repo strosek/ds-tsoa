@@ -6,6 +6,12 @@
 
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
@@ -13,7 +19,7 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.IntByteConverter;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 
 
-public final class MicroNucleo extends MicroNucleoBase{
+public final class MicroNucleo extends MicroNucleoBase {
 	private static MicroNucleo m_kernel = new MicroNucleo();
 	private Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
 	private Hashtable<Integer, ParMaquinaProceso> m_receptionTable;
@@ -34,15 +40,15 @@ public final class MicroNucleo extends MicroNucleoBase{
 	 */
 	byte[] mensaje;
 
-	public void sendFalso(int dest,byte[] message){
+	public void sendFalso(int dest, byte[] message) {
 		System.arraycopy(message, 0, mensaje, 0, message.length);
 		
 		// Reanuda la ejecucion del proceso que haya invocado a receiveFalso()
 		notificarHilos();
 	}
 
-	public void receiveFalso(int addr,byte[] message){
-		mensaje=message;
+	public void receiveFalso(int addr, byte[] message){
+		mensaje = message;
 		suspenderProceso();
 	}
 
@@ -56,7 +62,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 		{
 			imprimeln("No se encontro");
 		}
-		
+
 		// TODO: get a valid origin ID
 		int originId = 248;
 
@@ -72,9 +78,42 @@ public final class MicroNucleo extends MicroNucleoBase{
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
 		}
+		
+		DatagramSocket txSocket;
+	    DatagramPacket packet;
+	    int txPort = 52007;
+	    
+	    // TODO: define a real rxPort and a real buffer.
+	    int rxPort = 12345;
+	    byte[] buffer = new byte[1];
 
+	    try
+	    {
+	    	txSocket = new DatagramSocket(txPort);
+	    	packet = new DatagramPacket(buffer, buffer.length,
+	    			InetAddress.getByName(pmp.dameIP()), rxPort);
+	    	txSocket.send(packet);
+	    	txSocket.close();
+	    }
+	    catch (SocketException e)
+	    {
+	    	System.err.println("Error creando socket transmision: " + 
+	    			e.getMessage());
+	    }
+	    catch(UnknownHostException e)
+	    {
+	    	System.err.println("Error creando socket transmision: " +
+	    			e.getMessage());
+	    }
+	    catch(IOException e)
+	    {
+	    	System.err.println("Error creando socket transmision: " +
+	    			e.getMessage());
+	    }
+
+	    // TODO: check if this should be here.
 		sendFalso(dest,message);
-		imprimeln("El proceso invocante es el "+super.dameIdProceso());
+		imprimeln("El proceso invocante es el " + super.dameIdProceso());
 
 		
 		// esta invocacion depende de si se requiere bloquear al hilo de control 
@@ -82,42 +121,43 @@ public final class MicroNucleo extends MicroNucleoBase{
 		suspenderProceso();
 	}
 
-	protected void receiveVerdadero(int addr,byte[] message){
+	protected void receiveVerdadero(int addr, byte[] message) {
 		receiveFalso(addr,message);
 		//el siguiente aplica para la practica #2
-		//suspenderProceso();
+		suspenderProceso();
 	}
 
 	/**
 	 * Para el(la) encargad@ de direccionamiento por servidor de nombres en 
 	 * practica 5  
 	 */
-	protected void sendVerdadero(String dest, byte[] message){
+	protected void sendVerdadero(String dest, byte[] message) {
 	}
 
 	/**
 	 * Para el(la) encargad@ de primitivas sin bloqueo en practica 5
 	 */
-	protected void sendNBVerdadero(int dest, byte[] message){
+	protected void sendNBVerdadero(int dest, byte[] message) {
 	}
 
 	/**
 	 * Para el(la) encargad@ de primitivas sin bloqueo en practica 5
 	 */
-	protected void receiveNBVerdadero(int addr, byte[] message){
+	protected void receiveNBVerdadero(int addr, byte[] message) {
 	}
 
 	public void run(){
 
-		while(seguirEsperandoDatagramas()){
+		while(seguirEsperandoDatagramas()) {
 			/* Lo siguiente es reemplazable en la practica #2,
 			 * sin esto, en practica #1, segun el JRE, puede incrementar el 
 			 * uso de CPU
-			 */ 
+			 */
+
 			// TODO: remove this to have fast feedback of processes.
-			try{
+			try {
 				sleep(60000);
-			}catch(InterruptedException e){
+			} catch (InterruptedException e) {
 				System.out.println("InterruptedException");
 			}
 		}
