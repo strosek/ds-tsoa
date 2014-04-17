@@ -20,11 +20,12 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 
 
 public final class MicroNucleo extends MicroNucleoBase {
-	private static MicroNucleo m_kernel = new MicroNucleo();
+	private static MicroNucleo m_kernel;
 	private Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
-	private Hashtable<Integer, ParMaquinaProceso> m_receptionTable;
+	private Hashtable<Integer, byte[]>            m_receptionTable;
 
 	private MicroNucleo() {
+		m_kernel = new MicroNucleo();
 	}
 
 	public final static MicroNucleo obtenerMicroNucleo() {
@@ -57,10 +58,13 @@ public final class MicroNucleo extends MicroNucleoBase {
 	}
 
 	protected void sendVerdadero(int dest, byte[] message) {
-		// TODO: add real action when not found (send AU packet).
 		if (m_emissionTable.containsKey(new Integer(dest)))
 		{
-			imprimeln("No se encontro");
+		}
+		else
+		{
+			// TODO: add real action when not found (send AU packet).
+			imprimeln("No se encontro el proceso destino");
 		}
 
 		// TODO: get a valid origin ID
@@ -82,7 +86,7 @@ public final class MicroNucleo extends MicroNucleoBase {
 		DatagramSocket txSocket;
 	    DatagramPacket packet;
 	    int txPort = 52007;
-	    
+
 	    // TODO: define a real rxPort and a real buffer.
 	    int rxPort = 12345;
 	    byte[] buffer = new byte[1];
@@ -122,6 +126,8 @@ public final class MicroNucleo extends MicroNucleoBase {
 	}
 
 	protected void receiveVerdadero(int addr, byte[] message) {
+		m_receptionTable.put(addr, message);
+		// TODO: check if this "false" call should be removed.
 		receiveFalso(addr,message);
 		//el siguiente aplica para la practica #2
 		suspenderProceso();
