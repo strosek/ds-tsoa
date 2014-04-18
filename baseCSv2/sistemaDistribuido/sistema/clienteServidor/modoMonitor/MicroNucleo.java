@@ -12,6 +12,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
@@ -153,19 +154,41 @@ public final class MicroNucleo extends MicroNucleoBase {
 	}
 
 	public void run(){
+		final int PORT_RX = 54321;
+        DatagramSocket rxSocket;
+        DatagramPacket packet;
+        byte[] buffer = new byte[ProcesoCliente.SIZE_PACKET];
+        
+        String originIp;
+        int destination;
+        int origin;
 
 		while(seguirEsperandoDatagramas()) {
-			/* Lo siguiente es reemplazable en la practica #2,
-			 * sin esto, en practica #1, segun el JRE, puede incrementar el 
-			 * uso de CPU
-			 */
-
-			// TODO: remove this to have fast feedback of processes.
-			try {
-				sleep(60000);
-			} catch (InterruptedException e) {
-				System.out.println("InterruptedException");
-			}
+			try
+		    {
+	          rxSocket = new DatagramSocket(PORT_RX);
+		      packet = new DatagramPacket(buffer, buffer.length);
+		      while (true)
+		      {
+		        rxSocket.receive(packet);
+		        origin = IntByteConverter.toInt(
+		        		Arrays.copyOfRange(packet.getData(), 0,
+		        		IntByteConverter.SIZE_INT - 1));
+		        destination = IntByteConverter.toInt(
+		        		Arrays.copyOfRange(packet.getData(),
+		        		IntByteConverter.SIZE_INT,
+		        		IntByteConverter.SIZE_INT * 2 - 1));
+		        originIp = packet.getAddress().getHostAddress();
+		        m_kernel.dameProcesoLocal(destination);
+		      }
+		    }
+		    catch (SocketException e)
+		    {
+		      System.out.println("Error iniciando socket recepcion: " + e.getMessage());
+		    }
+		    catch (IOException e){
+		      System.out.println("Error iniciando socket recepcion: " + e.getMessage());
+		    }		
 		}
 	}
 }
