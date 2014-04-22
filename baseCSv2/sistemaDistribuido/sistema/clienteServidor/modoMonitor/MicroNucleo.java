@@ -17,6 +17,7 @@ import java.util.Hashtable;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.IntByteConverter;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 
 
@@ -59,78 +60,60 @@ public final class MicroNucleo extends MicroNucleoBase {
 	}
 
 	protected void sendVerdadero(int dest, byte[] message) {
+		ParMaquinaProceso pmp;
+		
+		int origin = super.dameIdProceso();
+		int id;
+		String ip;
+		
 		if (m_emissionTable.containsKey(new Integer(dest)))
 		{
+			ip = m_emissionTable.get(dest).dameIP();
+			id = m_emissionTable.get(dest).dameID();
 		}
 		else
 		{
-			// TODO: add real action when not found (send AU packet).
-			imprimeln("No se encontro el proceso destino");
+			pmp = dameDestinatarioDesdeInterfaz();
+			imprimeln("Enviando mensaje a IP=" + pmp.dameIP() + " ID=" +
+					  pmp.dameID());
+			ip = pmp.dameIP();
+			id = pmp.dameID();
 		}
 
-		// TODO: get a valid origin ID
-		int originId = 248;
-
-		byte[] originBytes = IntByteConverter.toBytes(originId);
+		byte[] originBytes = IntByteConverter.toBytes(origin);
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
 		}
 
-		ParMaquinaProceso pmp = dameDestinatarioDesdeInterfaz();
-		imprimeln("Enviando mensaje a IP=" + pmp.dameIP() + " ID=" +
-				  pmp.dameID());
-		byte[] destinationBytes = IntByteConverter.toBytes(pmp.dameID());
+		byte[] destinationBytes = IntByteConverter.toBytes(id);
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
-			message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
+			message[ProcesoCliente.INDEX_DESTINATION + i] =
+					destinationBytes[i];
 		}
-		
-		DatagramSocket txSocket;
-	    DatagramPacket packet;
-	    int txPort = 52007;
 
-	    // TODO: define a real rxPort and a real buffer.
-	    int rxPort = 12345;
-	    byte[] buffer = new byte[1];
+		DatagramPacket packet;
+		DatagramSocket socket = m_kernel.dameSocketEmision();
+		try
+		{
+			packet = new DatagramPacket(message, message.length,
+					InetAddress.getByName(ip),
+					m_kernel.damePuertoRecepcion());
+			socket.send(packet);
+		}
+		catch(UnknownHostException e)
+		{
+			System.err.println("Error creando socket transmision: " +
+					e.getMessage());
+		} catch (IOException e) {
+			System.err.println("Error creando socket transmision: " +
+					e.getMessage());
+		}
 
-	    try
-	    {
-	    	txSocket = new DatagramSocket(txPort);
-	    	packet = new DatagramPacket(buffer, buffer.length,
-	    			InetAddress.getByName(pmp.dameIP()), rxPort);
-	    	txSocket.send(packet);
-	    	txSocket.close();
-	    }
-	    catch (SocketException e)
-	    {
-	    	System.err.println("Error creando socket transmision: " + 
-	    			e.getMessage());
-	    }
-	    catch(UnknownHostException e)
-	    {
-	    	System.err.println("Error creando socket transmision: " +
-	    			e.getMessage());
-	    }
-	    catch(IOException e)
-	    {
-	    	System.err.println("Error creando socket transmision: " +
-	    			e.getMessage());
-	    }
-
-	    // TODO: check if this should be here.
-		sendFalso(dest,message);
 		imprimeln("El proceso invocante es el " + super.dameIdProceso());
-
-		
-		// esta invocacion depende de si se requiere bloquear al hilo de control 
-		// invocador
-		suspenderProceso();
 	}
 
 	protected void receiveVerdadero(int addr, byte[] message) {
 		m_receptionTable.put(addr, message);
-		// TODO: check if this "false" call should be removed.
-		receiveFalso(addr,message);
-		//el siguiente aplica para la practica #2
 		suspenderProceso();
 	}
 
@@ -154,7 +137,6 @@ public final class MicroNucleo extends MicroNucleoBase {
 	}
 
 	public void run(){
-		final int PORT_RX = 54321;
         DatagramSocket rxSocket;
         DatagramPacket packet;
         byte[] buffer = new byte[ProcesoCliente.SIZE_PACKET];
@@ -162,25 +144,40 @@ public final class MicroNucleo extends MicroNucleoBase {
         String originIp;
         int destination;
         int origin;
+        Proceso process;
 
 		while(seguirEsperandoDatagramas()) {
 			try
 		    {
-	          rxSocket = new DatagramSocket(PORT_RX);
-		      packet = new DatagramPacket(buffer, buffer.length);
-		      while (true)
-		      {
-		        rxSocket.receive(packet);
-		        origin = IntByteConverter.toInt(
-		        		Arrays.copyOfRange(packet.getData(), 0,
-		        		IntByteConverter.SIZE_INT - 1));
-		        destination = IntByteConverter.toInt(
-		        		Arrays.copyOfRange(packet.getData(),
-		        		IntByteConverter.SIZE_INT,
-		        		IntByteConverter.SIZE_INT * 2 - 1));
-		        originIp = packet.getAddress().getHostAddress();
-		        m_kernel.dameProcesoLocal(destination);
-		      }
+				rxSocket = m_kernel.dameSocketRecepcion();
+				packet = new DatagramPacket(buffer, buffer.length);
+				rxSocket.receive(packet);
+				origin = IntByteConverter.toInt(
+						Arrays.copyOfRange(packet.getData(), 0,
+								IntByteConverter.SIZE_INT - 1));
+				destination = IntByteConverter.toInt(
+						Arrays.copyOfRange(packet.getData(),
+								IntByteConverter.SIZE_INT,
+								IntByteConverter.SIZE_INT * 2 - 1));
+				originIp = packet.getAddress().getHostAddress();
+
+				process = m_kernel.dameProcesoLocal(destination);
+				if (process != null)
+				{
+					if (m_receptionTable.containsKey(destination))
+					{
+						byte[] array = m_receptionTable.get(destination);
+						System.arraycopy(packet.getData(), 0, array, 0,
+								array.length);
+						m_emissionTable.put(origin, new MachineProcessPair(originIp, origin));
+						m_receptionTable.remove(destination);
+						m_kernel.reanudarProceso(process);
+					}
+				}
+				else
+				{
+					// TODO: send the AU packet back to the client.
+				}
 		    }
 		    catch (SocketException e)
 		    {
