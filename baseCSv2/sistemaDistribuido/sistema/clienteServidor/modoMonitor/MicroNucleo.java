@@ -22,12 +22,13 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 
 
 public final class MicroNucleo extends MicroNucleoBase {
-	private static MicroNucleo m_kernel;
+	private static MicroNucleo m_kernel = new MicroNucleo();
 	private Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
 	private Hashtable<Integer, byte[]>            m_receptionTable;
 
 	private MicroNucleo() {
-		m_kernel = new MicroNucleo();
+		m_emissionTable = new Hashtable<Integer, ParMaquinaProceso>();
+		m_receptionTable = new Hashtable<Integer, byte[]>();
 	}
 
 	public final static MicroNucleo obtenerMicroNucleo() {
@@ -140,7 +141,7 @@ public final class MicroNucleo extends MicroNucleoBase {
         DatagramSocket rxSocket;
         DatagramPacket packet;
         byte[] buffer = new byte[ProcesoCliente.SIZE_PACKET];
-        
+
         String originIp;
         int destination;
         int origin;

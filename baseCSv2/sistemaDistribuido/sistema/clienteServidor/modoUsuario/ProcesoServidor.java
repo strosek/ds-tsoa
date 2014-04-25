@@ -121,6 +121,7 @@ public class ProcesoServidor extends Proceso {
 			}
 		}
 		catch (IOException ioe) {
+			System.out.println("Se ha lanzado excepcion: "); 
 			ioe.printStackTrace();
 		}
 	}
