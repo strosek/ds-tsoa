@@ -1,3 +1,9 @@
+/*
+ * Erick Daniel Corona Garcia 210224314. TSOA D03.
+ * 
+ * Modificado para Practica 2.
+ */
+
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
 public class MachineProcessPair implements ParMaquinaProceso {
