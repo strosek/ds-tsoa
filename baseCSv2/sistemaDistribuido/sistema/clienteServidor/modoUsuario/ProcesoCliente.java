@@ -89,6 +89,10 @@ public class ProcesoCliente extends Proceso {
 		case ProcesoServidor.STATUS_ERR_WRITE:
 			imprimeln("Error al elcribir el archivo");
 			break;
+		case ProcesoServidor.STATUS_AU:
+			imprimeln("Error al error al enviar, se " + 
+					  "recibio \"Direccion Desconocida=\");
+			break;
 		}
 	}
 
