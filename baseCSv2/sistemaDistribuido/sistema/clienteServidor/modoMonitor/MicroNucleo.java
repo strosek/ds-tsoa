@@ -6,13 +6,29 @@
 
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Hashtable;
+
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
+import sistemaDistribuido.util.IntByteConverter;
 
 
 public final class MicroNucleo extends MicroNucleoBase{
-	private static MicroNucleo nucleo=new MicroNucleo();
+	private static MicroNucleo                     nucleo = new MicroNucleo();
+	private Hashtable<Integer, MachineProcessPair> m_emissionTable;
+	private Hashtable<Integer, byte[]>             m_receptionTable;
 
 	private MicroNucleo() {
+		m_emissionTable = new Hashtable<Integer, MachineProcessPair>();
+		m_receptionTable = new Hashtable<Integer, byte[]>();
 	}
 
 	public final static MicroNucleo obtenerMicroNucleo() {
@@ -30,7 +46,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 
 	public void sendFalso(int dest,byte[] message){
 		System.arraycopy(message,0,mensaje,0,message.length);
-		
+
 		//Reanuda la ejecucion del proceso que haya invocado a receiveFalso()
 		notificarHilos();
 	}
@@ -45,23 +61,55 @@ public final class MicroNucleo extends MicroNucleoBase{
 	}
 
 	protected void sendVerdadero(int dest,byte[] message){
-		sendFalso(dest,message);
-		imprimeln("El proceso invocante es el "+super.dameIdProceso());
-		
-		//lo siguiente aplica para la pr�ctica #2
-		/*ParMaquinaProceso pmp=dameDestinatarioDesdeInterfaz();
-		imprimeln("Enviando mensaje a IP="+pmp.dameIP()+" ID="+pmp.dameID());
-		
+		imprimeln("El proceso invocante es el " + super.dameIdProceso());
+
+		ParMaquinaProceso pmp;
+		int origin, destination;
+		String ip;
+		if (m_emissionTable.containsKey(new Integer(dest))) {
+			ip = m_emissionTable.get(new Integer(dest)).dameIP();
+			id = m_emissionTable.get(new Integer(dest)).dameID();
+		}
+		else {
+			imprimeln("Enviando mensaje a IP=" + pmp.dameIP() + " ID=" +
+					  pmp.dameID());
+
+			pmp = dameDestinatarioDesdeInterfaz();
+			ip = pmp.dameIP();
+			id = pmp.dameID();
+		}
+
+		byte[] originBytes = IntByteConverter.toBytes(origin);
+		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+			message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
+		}
+
+		byte[] destinationBytes = IntByteConverter.toBytes(id);
+		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+			message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
+		}
+
+		try {
+			DatagramPacket packet = new DatagramPacket(message, message.length,
+					InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
+			nucleo.dameSocketEmision().send(packet);
+		}
+		catch(UnknownHostException e) {
+			System.err.println("Error creando socket transmision: " +
+							   e.getMessage());
+		} catch (IOException e) {
+			System.err.println("Error creando socket transmision: " +
+							   e.getMessage());
+		}
+
 		// esta invocacion depende de si se requiere bloquear al hilo de control 
 		// invocador
-		suspenderProceso();
-		*/ 
+		// suspenderProceso();
 	}
 
-	protected void receiveVerdadero(int addr,byte[] message){
-		receiveFalso(addr,message);
-		//el siguiente aplica para la pr�ctica #2
-		//suspenderProceso();
+	protected void receiveVerdadero(int addr,byte[] message) {
+		m_receptionTable.put(new Integer(addr), message);
+		suspenderProceso();
 	}
 
 	/**
@@ -84,16 +132,48 @@ public final class MicroNucleo extends MicroNucleoBase{
 	}
 
 	public void run(){
+		byte[] buffer = new byte[ProcesoCliente.INDEX_MESSAGELENGTH];
+		DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+		int origin, destination;
+		String originIp;
+		Proceso process;
 
-		while(seguirEsperandoDatagramas()){
-			/* Lo siguiente es reemplazable en la pr�ctica #2,
-			 * sin esto, en pr�ctica #1, seg�n el JRE, puede incrementar el 
-			 * uso de CPU
-			 */ 
-			try{
-				sleep(60000);
-			}catch(InterruptedException e){
-				System.out.println("InterruptedException");
+		while (seguirEsperandoDatagramas()) {
+			try {
+				nucleo.dameSocketRecepcion().receive(packet);
+
+				origin = IntByteConverter.toInt(
+						Arrays.copyOfRange(packet.getData(),
+						ProcesoCliente.INDEX_ORIGIN,
+						IntByteConverter.SIZE_INT - 1));
+				destination = IntByteConverter.toInt(
+				Arrays.copyOfRange(packet.getData(),
+						ProcesoCliente.INDEX_DESTINATION,
+						IntByteConverter.SIZE_INT * 2 - 1));
+				originIp = packet.getAddress().getHostAddress();
+
+				process = nucleo.dameProcesoLocal(destination);
+				if (process != null)
+				{
+					if (m_receptionTable.containsKey(destination))
+					{
+						byte[] array = m_receptionTable.get(destination);
+						System.arraycopy(packet.getData(), 0, array, 0,
+								         array.length);
+						m_emissionTable.put(new Integer(origin),
+								new MachineProcessPair(originIp, origin));
+						m_receptionTable.remove(destination);
+						nucleo.reanudarProceso(process);
+					}
+					else {
+						buffer[ProcesoServidor.INDEX_STATUS] =
+								(byte)ProcesoServidor.STATUS_AU;
+						nucleo.send(origin, buffer);
+					}
+				}
+			} catch (IOException e) {
+				System.err.println("Error en la recepcion del paquete: " +
+								   e.getMessage());
 			}
 		}
 	}

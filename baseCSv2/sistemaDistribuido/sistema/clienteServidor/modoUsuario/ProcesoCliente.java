@@ -11,6 +11,8 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
 
 public class ProcesoCliente extends Proceso {
+	public static final int INDEX_ORIGIN =         0;
+	public static final int INDEX_DESTINATION =    5;
 	public static final int INDEX_OPCODE =         9;
 	public static final int INDEX_MESSAGELENGTH = 10;
 	public static final int INDEX_MESSAGE =       11;
@@ -86,6 +88,12 @@ public class ProcesoCliente extends Proceso {
 			break;
 		case ProcesoServidor.STATUS_ERR_WRITE:
 			imprimeln("Error al elcribir el archivo");
+			break;
+		case ProcesoServidor.STATUS_AU :
+			imprimeln("Error al enviar peticion: direccion desconocida.");
+			break;
+		default :
+			imprimeln("invalid status");
 			break;
 		}
 	}
