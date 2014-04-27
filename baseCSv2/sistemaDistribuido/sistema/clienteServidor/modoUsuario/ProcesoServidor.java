@@ -34,6 +34,7 @@ public class ProcesoServidor extends Proceso {
 	public static final int STATUS_ERR_WRITE =  5;
 	public static final int STATUS_ERR_CREATE = 6;
 	public static final int STATUS_ERR_DELETE = 7;
+	public static final int STATUS_AU =         8;
 	
 	public static final int SIZE_PACKET = 1024;
 	

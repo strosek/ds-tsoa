@@ -19,6 +19,7 @@ import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.IntByteConverter;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
 
 
 public final class MicroNucleo extends MicroNucleoBase {
@@ -69,8 +70,8 @@ public final class MicroNucleo extends MicroNucleoBase {
 		
 		if (m_emissionTable.containsKey(new Integer(dest)))
 		{
-			ip = m_emissionTable.get(dest).dameIP();
-			id = m_emissionTable.get(dest).dameID();
+			ip = m_emissionTable.get(new Integer(dest)).dameIP();
+			id = m_emissionTable.get(new Integer(dest)).dameID();
 		}
 		else
 		{
@@ -114,7 +115,7 @@ public final class MicroNucleo extends MicroNucleoBase {
 	}
 
 	protected void receiveVerdadero(int addr, byte[] message) {
-		m_receptionTable.put(addr, message);
+		m_receptionTable.put(new Integer(addr), message);
 		suspenderProceso();
 	}
 
@@ -170,23 +171,28 @@ public final class MicroNucleo extends MicroNucleoBase {
 						byte[] array = m_receptionTable.get(destination);
 						System.arraycopy(packet.getData(), 0, array, 0,
 								array.length);
-						m_emissionTable.put(origin, new MachineProcessPair(originIp, origin));
+						m_emissionTable.put(new Integer(origin),
+								new MachineProcessPair(originIp, origin));
 						m_receptionTable.remove(destination);
 						m_kernel.reanudarProceso(process);
 					}
 				}
 				else
 				{
-					// TODO: send the AU packet back to the client.
+					buffer[ProcesoServidor.INDEX_STATUS] = 
+							(byte)ProcesoServidor.STATUS_AU;
+					m_kernel.send(origin, buffer);
 				}
 		    }
-		    catch (SocketException e)
-		    {
-		      System.out.println("Error iniciando socket recepcion: " + e.getMessage());
-		    }
-		    catch (IOException e){
-		      System.out.println("Error iniciando socket recepcion: " + e.getMessage());
-		    }		
+			catch (SocketException e)
+			{
+				System.out.println("Error iniciando socket recepcion: " +
+						e.getMessage());
+			}
+			catch (IOException e) {
+				System.out.println("Error iniciando socket recepcion: " +
+						e.getMessage());
+			}		
 		}
 	}
 }
