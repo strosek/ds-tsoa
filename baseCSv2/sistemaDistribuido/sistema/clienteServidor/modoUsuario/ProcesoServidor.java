@@ -12,10 +12,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
+import sistemaDistribuido.util.IntByteConverter;
 import sistemaDistribuido.util.Pausador;
 import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
@@ -97,7 +99,12 @@ public class ProcesoServidor extends Proceso {
 			imprimeln("Senhalamiento al nucleo para envio de mensaje...");
 			// avoid server's send() before client's receive()
 			Pausador.pausa(1000);
-			Nucleo.send(0, m_response);
+
+			int origin = IntByteConverter.toInt(
+					Arrays.copyOfRange(m_request, ProcesoCliente.INDEX_ORIGIN,
+					ProcesoCliente.INDEX_ORIGIN +
+					IntByteConverter.SIZE_INT - 1));
+			Nucleo.send(origin, m_response);
 		}
 	}
 	

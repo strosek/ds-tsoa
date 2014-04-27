@@ -8,7 +8,6 @@ package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -64,22 +63,22 @@ public final class MicroNucleo extends MicroNucleoBase{
 		imprimeln("El proceso invocante es el " + super.dameIdProceso());
 
 		ParMaquinaProceso pmp;
-		int origin, destination;
 		String ip;
+		int id;
 		if (m_emissionTable.containsKey(new Integer(dest))) {
 			ip = m_emissionTable.get(new Integer(dest)).dameIP();
 			id = m_emissionTable.get(new Integer(dest)).dameID();
 		}
 		else {
+			pmp = dameDestinatarioDesdeInterfaz();
 			imprimeln("Enviando mensaje a IP=" + pmp.dameIP() + " ID=" +
 					  pmp.dameID());
 
-			pmp = dameDestinatarioDesdeInterfaz();
 			ip = pmp.dameIP();
 			id = pmp.dameID();
 		}
 
-		byte[] originBytes = IntByteConverter.toBytes(origin);
+		byte[] originBytes = IntByteConverter.toBytes(super.dameIdProceso());
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
 		}
