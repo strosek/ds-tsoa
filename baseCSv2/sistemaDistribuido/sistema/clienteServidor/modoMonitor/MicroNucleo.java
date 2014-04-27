@@ -181,7 +181,9 @@ public final class MicroNucleo extends MicroNucleoBase {
 				{
 					buffer[ProcesoServidor.INDEX_STATUS] = 
 							(byte)ProcesoServidor.STATUS_AU;
-					m_kernel.send(origin, buffer);
+					packet = new DatagramPacket(buffer, buffer.length);
+					DatagramSocket socket = m_kernel.dameSocketEmision();
+					socket.send(packet);
 				}
 		    }
 			catch (SocketException e)

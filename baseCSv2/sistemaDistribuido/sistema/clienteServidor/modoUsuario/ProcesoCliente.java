@@ -91,7 +91,7 @@ public class ProcesoCliente extends Proceso {
 			break;
 		case ProcesoServidor.STATUS_AU:
 			imprimeln("Error al error al enviar, se " + 
-					  "recibio \"Direccion Desconocida=\");
+					  "recibio \"Direccion Desconocida=\"");
 			break;
 		}
 	}
