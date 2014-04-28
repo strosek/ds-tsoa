@@ -18,7 +18,6 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
 import sistemaDistribuido.util.IntByteConverter;
-import sistemaDistribuido.util.Pausador;
 
 
 public final class MicroNucleo extends MicroNucleoBase{
@@ -67,10 +66,12 @@ public final class MicroNucleo extends MicroNucleoBase{
 		String ip;
 		int id;
 		if (m_emissionTable.containsKey(new Integer(dest))) {
+			System.out.println("micronucleo: found " + dest + " in emmissionTable.");
 			ip = m_emissionTable.get(new Integer(dest)).dameIP();
 			id = m_emissionTable.get(new Integer(dest)).dameID();
 		}
 		else {
+			System.out.println("micronucleo: " + dest + " not found in emmissionTable.");
 			pmp = dameDestinatarioDesdeInterfaz();
 			ip = pmp.dameIP();
 			id = pmp.dameID();
@@ -90,6 +91,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 		try {
 			DatagramPacket packet = new DatagramPacket(message, message.length,
 					InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
+			System.out.println("micronucleo: enviando paquete");
 			nucleo.dameSocketEmision().send(packet);
 		}
 		catch(UnknownHostException e) {
@@ -107,6 +109,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 	}
 
 	protected void receiveVerdadero(int addr,byte[] message) {
+		System.out.println("micronucleo: insertando ID: " + addr + " en tabla recepcion");
 		m_receptionTable.put(new Integer(addr), message);
 		suspenderProceso();
 	}
@@ -156,11 +159,13 @@ public final class MicroNucleo extends MicroNucleoBase{
 				process = nucleo.dameProcesoLocal(destination);
 				if (process != null)
 				{
+					System.out.println("micronucleo: process found");
 					if (m_receptionTable.containsKey(destination))
 					{
 						byte[] array = m_receptionTable.get(destination);
 						System.arraycopy(packet.getData(), 0, array, 0,
 								         array.length);
+						System.out.println("micronucleo: insertando ID: " + origin + " en tabla emision");
 						m_emissionTable.put(new Integer(origin),
 								new MachineProcessPair(originIp, origin));
 						m_receptionTable.remove(destination);
@@ -168,6 +173,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 					}
 				}
 				else {
+					System.out.println("micronucleo: sending AU");
 					buffer[ProcesoServidor.INDEX_STATUS] =
 							(byte)ProcesoServidor.STATUS_AU;
 					nucleo.send(origin, buffer);
