@@ -112,7 +112,7 @@ public class ProcesoServidor extends Proceso {
 		String fileName = m_requestMessage;
 		try {
 			imprimeln("Nombre archivo " + fileName);
-			File myFile = new File(m_requestMessage);
+			File myFile = new File(fileName);
 			if (myFile.createNewFile()) {
 				m_status = STATUS_SUC_CREATE;
 				imprimeln("Archivo creado!");
