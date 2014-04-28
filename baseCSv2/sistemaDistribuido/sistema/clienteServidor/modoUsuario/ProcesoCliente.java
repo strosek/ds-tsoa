@@ -12,7 +12,7 @@ import sistemaDistribuido.util.Escribano;
 
 public class ProcesoCliente extends Proceso {
 	public static final int INDEX_ORIGIN =         0;
-	public static final int INDEX_DESTINATION =    5;
+	public static final int INDEX_DESTINATION =    4;
 	public static final int INDEX_OPCODE =         9;
 	public static final int INDEX_MESSAGELENGTH = 10;
 	public static final int INDEX_MESSAGE =       11;
