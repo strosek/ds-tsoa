@@ -78,14 +78,17 @@ public final class MicroNucleo extends MicroNucleoBase{
 			imprimeln("Enviando mensaje a IP=" + ip + " ID=" + id);
 		}
 
+		System.out.println("micronucleo: id origin: " + super.dameIdProceso());
 		byte[] originBytes = IntByteConverter.toBytes(super.dameIdProceso());
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
 		}
 
+		System.out.println("micronucleo: id destination: " + id);
 		byte[] destinationBytes = IntByteConverter.toBytes(id);
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
+			//System.out.println("micronucleo: messagedest " + i +" " + message[ProcesoCliente.INDEX_DESTINATION + i]);
 		}
 
 		try {
@@ -102,10 +105,6 @@ public final class MicroNucleo extends MicroNucleoBase{
 			System.err.println("Error creando socket transmision: " +
 							   e.getMessage());
 		}
-
-		// esta invocacion depende de si se requiere bloquear al hilo de control 
-		// invocador
-		// suspenderProceso();
 	}
 
 	protected void receiveVerdadero(int addr,byte[] message) {
@@ -147,14 +146,18 @@ public final class MicroNucleo extends MicroNucleoBase{
 				origin = IntByteConverter.toInt(
 						Arrays.copyOfRange(packet.getData(),
 						ProcesoCliente.INDEX_ORIGIN,
-						ProcesoCliente.INDEX_ORIGIN + 
-						IntByteConverter.SIZE_INT - 1));
+						ProcesoCliente.INDEX_ORIGIN +
+						IntByteConverter.SIZE_INT));
+				System.out.println("micronucleo: origin: " + origin);
+				originIp = packet.getAddress().getHostAddress();
+				System.out.println("micronucleo: originIp: " + origin);
+
 				destination = IntByteConverter.toInt(
 						Arrays.copyOfRange(packet.getData(),
 						ProcesoCliente.INDEX_DESTINATION,
 						ProcesoCliente.INDEX_DESTINATION + 
-						IntByteConverter.SIZE_INT - 1));
-				originIp = packet.getAddress().getHostAddress();
+						IntByteConverter.SIZE_INT));
+				System.out.println("micronucleo: destination: " + destination);
 
 				process = nucleo.dameProcesoLocal(destination);
 				if (process != null)
@@ -174,9 +177,12 @@ public final class MicroNucleo extends MicroNucleoBase{
 				}
 				else {
 					System.out.println("micronucleo: sending AU");
-					buffer[ProcesoServidor.INDEX_STATUS] =
+					buffer[ProcesoServidor.INDEX_STATUS] = 
 							(byte)ProcesoServidor.STATUS_AU;
-					nucleo.send(origin, buffer);
+					packet = new DatagramPacket(buffer, buffer.length,
+							InetAddress.getByName(originIp),
+							damePuertoRecepcion());
+					nucleo.dameSocketEmision().send(packet);
 				}
 			}
 			catch (IOException e) {
