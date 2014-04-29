@@ -142,7 +142,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 		while (seguirEsperandoDatagramas()) {
 			try {
 				nucleo.dameSocketRecepcion().receive(packet);
-
+				
 				origin = IntByteConverter.toInt(
 						Arrays.copyOfRange(packet.getData(),
 						ProcesoCliente.INDEX_ORIGIN,
@@ -150,7 +150,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 						IntByteConverter.SIZE_INT));
 				System.out.println("micronucleo: origin: " + origin);
 				originIp = packet.getAddress().getHostAddress();
-				System.out.println("micronucleo: originIp: " + origin);
+				System.out.println("micronucleo: originIp: " + originIp);
 
 				destination = IntByteConverter.toInt(
 						Arrays.copyOfRange(packet.getData(),
@@ -160,6 +160,14 @@ public final class MicroNucleo extends MicroNucleoBase{
 				System.out.println("micronucleo: destination: " + destination);
 
 				process = nucleo.dameProcesoLocal(destination);
+				if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
+					ProcesoServidor.STATUS_AU) {
+					imprimeln("Servidor desconocido.");
+					nucleo.reanudarProceso(process);
+					continue;
+				}
+
+
 				if (process != null)
 				{
 					System.out.println("micronucleo: process found");
@@ -179,9 +187,11 @@ public final class MicroNucleo extends MicroNucleoBase{
 					System.out.println("micronucleo: sending AU");
 					buffer[ProcesoServidor.INDEX_STATUS] = 
 							(byte)ProcesoServidor.STATUS_AU;
+					System.out.println("buffer au: " + buffer[ProcesoServidor.INDEX_STATUS]);
+					System.out.println("origin ip: " + originIp);
 					packet = new DatagramPacket(buffer, buffer.length,
 							InetAddress.getByName(originIp),
-							damePuertoRecepcion());
+							nucleo.damePuertoRecepcion());
 					nucleo.dameSocketEmision().send(packet);
 				}
 			}
