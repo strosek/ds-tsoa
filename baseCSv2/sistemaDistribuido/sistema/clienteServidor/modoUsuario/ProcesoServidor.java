@@ -23,9 +23,9 @@ import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
 
 public class ProcesoServidor extends Proceso {
-	public static final int INDEX_STATUS =     0;
-	public static final int INDEX_MESSLENGTH = 1;
-	public static final int INDEX_MESSAGE =    2;
+	public static final int INDEX_STATUS =     8;
+	public static final int INDEX_MESSLENGTH = 9;
+	public static final int INDEX_MESSAGE =    10;
 
 	public static final int STATUS_SUC_READ =   0;
 	public static final int STATUS_SUC_WRITE =  1;
@@ -103,7 +103,21 @@ public class ProcesoServidor extends Proceso {
 			int origin = IntByteConverter.toInt(
 					Arrays.copyOfRange(m_request, ProcesoCliente.INDEX_ORIGIN,
 					ProcesoCliente.INDEX_ORIGIN +
-					IntByteConverter.SIZE_INT - 1));
+					IntByteConverter.SIZE_INT));
+			int destanation = IntByteConverter.toInt(
+					Arrays.copyOfRange(m_request, 
+					ProcesoCliente.INDEX_DESTINATION,
+					ProcesoCliente.INDEX_DESTINATION +
+					IntByteConverter.SIZE_INT));
+			
+			byte[] originBytes = IntByteConverter.toBytes(origin);
+			byte[] destinationBytes = IntByteConverter.toBytes(destanation);
+			for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+				m_response[ProcesoCliente.INDEX_ORIGIN + i] =
+						destinationBytes[i];
+				m_response[ProcesoCliente.INDEX_DESTINATION + i] =
+						originBytes[i];
+			}
 			Nucleo.send(origin, m_response);
 		}
 	}

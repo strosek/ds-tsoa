@@ -79,14 +79,12 @@ public final class MicroNucleo extends MicroNucleoBase{
 		}
 
 		System.out.println("micronucleo: id origin: " + super.dameIdProceso());
+		System.out.println("micronucleo: id destination: " + id);
 		byte[] originBytes = IntByteConverter.toBytes(super.dameIdProceso());
+		byte[] destinationBytes = IntByteConverter.toBytes(id);
+
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
-		}
-
-		System.out.println("micronucleo: id destination: " + id);
-		byte[] destinationBytes = IntByteConverter.toBytes(id);
-		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
 			//System.out.println("micronucleo: messagedest " + i +" " + message[ProcesoCliente.INDEX_DESTINATION + i]);
 		}
