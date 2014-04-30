@@ -160,17 +160,15 @@ public final class MicroNucleo extends MicroNucleoBase{
 				process = nucleo.dameProcesoLocal(destination);
 				if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
 					ProcesoServidor.STATUS_AU) {
-					imprimeln("Servidor desconocido.");
+					imprimeln("Enviando AU. Servidor desconocido.");
 					nucleo.reanudarProceso(process);
 					continue;
 				}
 
 
-				if (process != null)
-				{
+				if (process != null) {
 					System.out.println("micronucleo: process found");
-					if (m_receptionTable.containsKey(destination))
-					{
+					if (m_receptionTable.containsKey(destination)) {
 						byte[] array = m_receptionTable.get(destination);
 						System.arraycopy(packet.getData(), 0, array, 0,
 								         array.length);

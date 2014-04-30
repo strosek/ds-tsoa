@@ -98,7 +98,7 @@ public class ProcesoServidor extends Proceso {
 
 			imprimeln("Senhalamiento al nucleo para envio de mensaje...");
 			// avoid server's send() before client's receive()
-			Pausador.pausa(1000);
+			Pausador.pausa(2000);
 
 			int origin = IntByteConverter.toInt(
 					Arrays.copyOfRange(m_request, ProcesoCliente.INDEX_ORIGIN,
@@ -118,6 +118,7 @@ public class ProcesoServidor extends Proceso {
 				m_response[ProcesoCliente.INDEX_DESTINATION + i] =
 						originBytes[i];
 			}
+			System.out.println("enviando respuesta a proceso: " + origin);
 			Nucleo.send(origin, m_response);
 		}
 	}
