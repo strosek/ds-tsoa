@@ -104,14 +104,14 @@ public class ProcesoServidor extends Proceso {
 					Arrays.copyOfRange(m_request, ProcesoCliente.INDEX_ORIGIN,
 					ProcesoCliente.INDEX_ORIGIN +
 					IntByteConverter.SIZE_INT));
-			int destanation = IntByteConverter.toInt(
+			int destination = IntByteConverter.toInt(
 					Arrays.copyOfRange(m_request, 
 					ProcesoCliente.INDEX_DESTINATION,
 					ProcesoCliente.INDEX_DESTINATION +
 					IntByteConverter.SIZE_INT));
-			
+
 			byte[] originBytes = IntByteConverter.toBytes(origin);
-			byte[] destinationBytes = IntByteConverter.toBytes(destanation);
+			byte[] destinationBytes = IntByteConverter.toBytes(destination);
 			for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 				m_response[ProcesoCliente.INDEX_ORIGIN + i] =
 						destinationBytes[i];
@@ -119,6 +119,8 @@ public class ProcesoServidor extends Proceso {
 						originBytes[i];
 			}
 			System.out.println("enviando respuesta a proceso: " + origin);
+			System.out.println("enviando respuesta desde proceso : " +
+						       destination);
 			Nucleo.send(origin, m_response);
 		}
 	}

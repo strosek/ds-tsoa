@@ -7,21 +7,23 @@
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
 public class MachineProcessPair implements ParMaquinaProceso {
-	private String ip;
-	private int    id;
+	private String m_ip;
+	private int    m_id;
 	
 	public MachineProcessPair() {
 	}
 	public MachineProcessPair(String ip, int id) {
+		m_ip = ip;
+		m_id = id;
 	}
 
 	@Override
 	public String dameIP() {
-		return ip;
+		return m_ip;
 	}
 
 	@Override
 	public int dameID() {
-		return id;
+		return m_id;
 	}
 }
