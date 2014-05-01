@@ -50,7 +50,7 @@ public final class MicroNucleo extends MicroNucleoBase{
 		notificarHilos();
 	}
 
-	public void receiveFalso(int addr,byte[] message){
+	public void receiveFalso(int addr,byte[] message) {
 		mensaje=message;
 		suspenderProceso();
 	}
@@ -65,34 +65,33 @@ public final class MicroNucleo extends MicroNucleoBase{
 		ParMaquinaProceso pmp;
 		String ip;
 		int id;
+		
 		if (m_emissionTable.containsKey(new Integer(dest))) {
-			System.out.println("micronucleo: found " + dest + " in emmissionTable.");
 			ip = m_emissionTable.get(new Integer(dest)).dameIP();
 			id = m_emissionTable.get(new Integer(dest)).dameID();
 		}
 		else {
-			System.out.println("micronucleo: " + dest + " not found in emmissionTable.");
 			pmp = dameDestinatarioDesdeInterfaz();
 			ip = pmp.dameIP();
 			id = pmp.dameID();
 			imprimeln("Enviando mensaje a IP=" + ip + " ID=" + id);
 		}
+		imprimeln("Buscando en listas locales el par (" + ip + ", " +
+				  dest + ")");
 
-		System.out.println("micronucleo: id origin: " + super.dameIdProceso());
-		System.out.println("micronucleo: id destination: " + id);
 		byte[] originBytes = IntByteConverter.toBytes(super.dameIdProceso());
 		byte[] destinationBytes = IntByteConverter.toBytes(id);
 
+		imprime("Completando campos del encabezado del mensaje a ser enviado");
 		for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
 			message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
 			message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
-			//System.out.println("micronucleo: messagedest " + i +" " + message[ProcesoCliente.INDEX_DESTINATION + i]);
 		}
 
 		try {
 			DatagramPacket packet = new DatagramPacket(message, message.length,
 					InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
-			System.out.println("micronucleo: enviando paquete");
+			imprime("Enviando mensaje por la red");
 			nucleo.dameSocketEmision().send(packet);
 		}
 		catch(UnknownHostException e) {
@@ -106,8 +105,9 @@ public final class MicroNucleo extends MicroNucleoBase{
 	}
 
 	protected void receiveVerdadero(int addr,byte[] message) {
-		System.out.println("micronucleo: insertando ID: " + addr + " en tabla recepcion");
 		m_receptionTable.put(new Integer(addr), message);
+		imprimeln("Recibido mensaje proviniente de la red");
+		imprimeln("Recibido mensaje que contiene la ubicacion: " + addr);
 		suspenderProceso();
 	}
 
@@ -146,17 +146,15 @@ public final class MicroNucleo extends MicroNucleoBase{
 						ProcesoCliente.INDEX_ORIGIN,
 						ProcesoCliente.INDEX_ORIGIN +
 						IntByteConverter.SIZE_INT));
-				System.out.println("micronucleo: origin: " + origin);
 				originIp = packet.getAddress().getHostAddress();
-				System.out.println("micronucleo: originIp: " + originIp);
 
 				destination = IntByteConverter.toInt(
 						Arrays.copyOfRange(packet.getData(),
 						ProcesoCliente.INDEX_DESTINATION,
 						ProcesoCliente.INDEX_DESTINATION + 
 						IntByteConverter.SIZE_INT));
-				System.out.println("micronucleo: destination: " + destination);
 
+				imprimeln("Buscando proceso correspondiente al campo recibido");
 				process = nucleo.dameProcesoLocal(destination);
 				if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
 					ProcesoServidor.STATUS_AU) {
@@ -165,14 +163,13 @@ public final class MicroNucleo extends MicroNucleoBase{
 					continue;
 				}
 
-
 				if (process != null) {
-					System.out.println("micronucleo: process found");
 					if (m_receptionTable.containsKey(destination)) {
 						byte[] array = m_receptionTable.get(destination);
+						
+						imprimeln("Copiando mensaje al espaco de proceso");
 						System.arraycopy(packet.getData(), 0, array, 0,
 								         array.length);
-						System.out.println("micronucleo: insertando ID: " + origin + " en tabla emision");
 						m_emissionTable.put(new Integer(origin),
 								new MachineProcessPair(originIp, origin));
 						m_receptionTable.remove(destination);
@@ -180,11 +177,10 @@ public final class MicroNucleo extends MicroNucleoBase{
 					}
 				}
 				else {
-					System.out.println("micronucleo: sending AU");
+					imprimeln("Proceso distinatario no encontrado segun el " +
+							  "campo dest recibido");
 					buffer[ProcesoServidor.INDEX_STATUS] = 
 							(byte)ProcesoServidor.STATUS_AU;
-					System.out.println("buffer au: " + buffer[ProcesoServidor.INDEX_STATUS]);
-					System.out.println("origin ip: " + originIp);
 					packet = new DatagramPacket(buffer, buffer.length,
 							InetAddress.getByName(originIp),
 							nucleo.damePuertoRecepcion());

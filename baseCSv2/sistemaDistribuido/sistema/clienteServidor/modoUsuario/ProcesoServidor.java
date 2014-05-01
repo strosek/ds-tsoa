@@ -118,9 +118,7 @@ public class ProcesoServidor extends Proceso {
 				m_response[ProcesoCliente.INDEX_DESTINATION + i] =
 						originBytes[i];
 			}
-			System.out.println("enviando respuesta a proceso: " + origin);
-			System.out.println("enviando respuesta desde proceso : " +
-						       destination);
+
 			Nucleo.send(origin, m_response);
 		}
 	}
