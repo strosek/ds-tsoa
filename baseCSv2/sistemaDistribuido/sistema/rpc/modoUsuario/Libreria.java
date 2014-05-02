@@ -5,23 +5,14 @@ import sistemaDistribuido.util.Escribano;
 public abstract class Libreria{
 	private Escribano esc;
 
-	/**
-	 * 
-	 */
 	public Libreria(Escribano esc){
 		this.esc=esc;
 	}
 
-	/**
-	 * 
-	 */
 	protected void imprime(String s){
 		esc.imprime(s);
 	}
 
-	/**
-	 * 
-	 */
 	protected void imprimeln(String s){
 		esc.imprimeln(s);
 	}
@@ -31,11 +22,10 @@ public abstract class Libreria{
 	 * Esto es lo que esta disponible como interfaz al usuario programador
 	 */
 	/*public int suma(int sum1,int sum2){
-    //...
-    suma();
-    //...
-    return 0;
-  }*/
+		suma();
+
+		return 0;
+	}*/
 
 	public int suma(int sum1,int sum2){
 		return sum1+sum2;
