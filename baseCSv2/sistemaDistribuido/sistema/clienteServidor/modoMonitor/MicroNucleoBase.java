@@ -9,314 +9,314 @@ import java.net.DatagramSocket;
 /**
  * 
  */
-public abstract class MicroNucleoBase extends MicroKernelBase{
-	private ParMaquinaProceso pmp;
+public abstract class MicroNucleoBase extends MicroKernelBase {
+    private ParMaquinaProceso pmp;
 
-	/**
-	 * Práctica 1 - Reanuda la ejecución del proceso que le toque recibir mensaje
-	 */
-	protected void notificarHilos(){
-		long[] procesos=super.getAllProcessIDs();
-		int i,j=procesos.length;
-		Proceso p;
-		for(i=0;i<j;i++){
-			if ((p=dameProcesoLocal((int)procesos[i]))!=null){
-				super.resumeThread(p);
-			}
-			else{
-				/* por concurrencia, procesos[i] pudo haber contenido un id de proceso conocido
-				 * pero sólo hasta antes de llamar a dameProcesoLocal (en distribuido se provocaría un paquete AU)
-				 */
-			}
-		}
-		imprimeln("Todos los hilos registrados han sido reanudados.");
-	}
-
-	/**
-	 * Para compatibilidad con versiones previas a 2008A
-	 */
-	protected int atenderProceso(){
-		return (int)super.getCurrentRunningProcessID();
-	}
-
-	/**
-	 * Práctica 1 - Inicia el sistema para máquina local
-	 */
-	public final synchronized void iniciarSistema(Escribano esc,int puertoEntrada){
-		super.initializeSystem(esc, puertoEntrada);
-	}
-
-	/**
-	 * Desde Práctica 2 - Inicia el sistema usando una fuente de información para IP e ID
-	 */
-	public final synchronized void iniciarSistema(Escribano esc,int puertoEntrada,ParMaquinaProceso pmp){
-		this.pmp=pmp;
-		iniciarSistema(esc,puertoEntrada);
-	}
-
-	/**
-	 * Desde Práctica 1 - Cierra el sistema local
-	 */
-	public final synchronized void cerrarSistema(){
-		super.shutdownSystem();
-	}
-
-	/**
-	 * Devuelve el ID de proceso del Proceso p
-	 */
-	public final int dameIdProceso(Proceso p){
-		return (int)super.getThreadID(p);
-	}
-	
-	/**
-	 * Termina un hilo t 
-	 */
-	public final void terminarHilo(SystemThread t){
-		super.terminateThread(t);
-	}
-	
     /**
-     * Devuelve true si el kernel no ha recibido la instrucción de cerrarse 
+     * Prï¿½ctica 1 - Reanuda la ejecuciï¿½n del proceso que le toque recibir
+     * mensaje
      */
-	protected final boolean estaDisponible(){
-		return super.isSystemAvailable();
-	}
+    protected void notificarHilos() {
+        long[] procesos = super.getAllProcessIDs();
+        int i, j = procesos.length;
+        Proceso p;
+        for (i = 0; i < j; i++) {
+            if ((p = dameProcesoLocal((int) procesos[i])) != null) {
+                super.resumeThread(p);
+            } else {
+                /*
+                 * por concurrencia, procesos[i] pudo haber contenido un id de
+                 * proceso conocido pero sï¿½lo hasta antes de llamar a
+                 * dameProcesoLocal (en distribuido se provocarï¿½a un paquete AU)
+                 */
+            }
+        }
+        imprimeln("Todos los hilos registrados han sido reanudados.");
+    }
 
-	/**
-	 * A realizarse cuando se solicita desbloquear un hilo
-	 */
-	protected void unblockingThread(SystemThread t) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Para compatibilidad con versiones previas a 2008A
+     */
+    protected int atenderProceso() {
+        return (int) super.getCurrentRunningProcessID();
+    }
 
-	/**
-	 * A realizarse antes de que un hilo ya no pueda recibir servicios del núcleo
-	 */
-	protected void finalizingThread(SystemThread p) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Prï¿½ctica 1 - Inicia el sistema para mï¿½quina local
+     */
+    public final synchronized void iniciarSistema(Escribano esc,
+            int puertoEntrada) {
+        super.initializeSystem(esc, puertoEntrada);
+    }
 
-	/**
-	 * Invocado desde MicroKernelBase
-	 */
-	protected boolean initializeModules() {
-		return iniciarModulos();
-	}
-	
-	/**
-	 * Invocado desde MicroKernelBase para aplicaciones con addr long
-	 */
-	protected void receiveImplememted(long addr, byte[] message) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Desde Prï¿½ctica 2 - Inicia el sistema usando una fuente de informaciï¿½n
+     * para IP e ID
+     */
+    public final synchronized void iniciarSistema(Escribano esc,
+            int puertoEntrada, ParMaquinaProceso pmp) {
+        this.pmp = pmp;
+        iniciarSistema(esc, puertoEntrada);
+    }
 
+    /**
+     * Desde Prï¿½ctica 1 - Cierra el sistema local
+     */
+    public final synchronized void cerrarSistema() {
+        super.shutdownSystem();
+    }
 
+    /**
+     * Devuelve el ID de proceso del Proceso p
+     */
+    public final int dameIdProceso(Proceso p) {
+        return (int) super.getThreadID(p);
+    }
 
+    /**
+     * Termina un hilo t
+     */
+    public final void terminarHilo(SystemThread t) {
+        super.terminateThread(t);
+    }
 
-	/*----Listado de metodos a usar y en su caso implementar en clase MicroNucleo----*/
+    /**
+     * Devuelve true si el kernel no ha recibido la instrucciï¿½n de cerrarse
+     */
+    protected final boolean estaDisponible() {
+        return super.isSystemAvailable();
+    }
 
+    /**
+     * A realizarse cuando se solicita desbloquear un hilo
+     */
+    protected void unblockingThread(SystemThread t) {
+        // TODO Auto-generated method stub
 
-	/**
-	 * Imprime texto
-	 */
-	protected final void imprime(String s){
-		super.print(s);
-	}
+    }
 
-	/**
-	 * Imprime texto más un salto de línea
-	 */
-	protected final void imprimeln(String s){
-		super.println(s);
-	}
+    /**
+     * A realizarse antes de que un hilo ya no pueda recibir servicios del
+     * nï¿½cleo
+     */
+    protected void finalizingThread(SystemThread p) {
+        // TODO Auto-generated method stub
 
-	/**
-	 * Imprime el nombre del thread invocante seguido del texto 
-	 */
-	protected final void timprime(String s){
-		super.tprint(s);
-	}
+    }
 
-	/**
-	 * Mismo que timprime más un salto de línea
-	 */
-	protected final void timprimeln(String s){
-		super.tprintln(s);
-	}
+    /**
+     * Invocado desde MicroKernelBase
+     */
+    protected boolean initializeModules() {
+        return iniciarModulos();
+    }
 
-	/**
-	 * Práctica 2 - Para obtener de la interfaz gráfica IP e ID del proceso destinatario
-	 */
-	protected final ParMaquinaProceso dameDestinatarioDesdeInterfaz(){
-		return pmp;
-	}
+    /**
+     * Invocado desde MicroKernelBase para aplicaciones con addr long
+     */
+    protected void receiveImplememted(long addr, byte[] message) {
+        // TODO Auto-generated method stub
 
-	/**
-	 * Práctica 2 - Socket para enviar datagramas
-	 */
-	protected final DatagramSocket dameSocketEmision(){
-		return super.getSendSocket();
-	}
+    }
 
-	/**
-	 * Práctica 2 - Socket para recibir datagramas
-	 */
-	protected final DatagramSocket dameSocketRecepcion(){
-		return super.getReceiveSocket();
-	}
+    /*----Listado de metodos a usar y en su caso implementar en clase MicroNucleo----*/
 
-	/**
-	 * Práctica 2 - Puerto para recibir mensajes
-	 */
-	protected final int damePuertoRecepcion(){
-		return super.getReceivePort();
-	}
+    /**
+     * Imprime texto
+     */
+    protected final void imprime(String s) {
+        super.print(s);
+    }
 
-	/**
-	 * Práctica 2 - devuelve distinto de null si el proceso des existe en esta máquina 
-	 */
-	protected final Proceso dameProcesoLocal(int dest){
-		return (Proceso)super.getLocalThread(dest);
-	}
+    /**
+     * Imprime texto mï¿½s un salto de lï¿½nea
+     */
+    protected final void imprimeln(String s) {
+        super.println(s);
+    }
 
-	/**
-	 * Práctica 2 - Invocado desde MicroKernelBase
-	 */
-	protected final void sendImplemented(int dest,byte[] message){
-		if (estaDisponible()){
-			timprimeln("solicita envio bloqueante de mensaje.");
-			sendVerdadero(dest,message);
-		}
-		else{
-			imprimeln("PROCESO NO REGISTRADO INTENTA ENVIAR MENSAJE");
-		}
-	}
+    /**
+     * Imprime el nombre del thread invocante seguido del texto
+     */
+    protected final void timprime(String s) {
+        super.tprint(s);
+    }
 
-	/**
-	 * Práctica 5 - Invocado desde MicroKernelBase
-	 */
-	protected final void sendImplemented(String dest, byte[] message) {
-		if (estaDisponible()){
-			timprimeln("solicita envio bloqueante de mensaje.");
-			sendVerdadero(dest,message);
-		}
-		else{
-			imprimeln("PROCESO NO REGISTRADO INTENTA ENVIAR MENSAJE");
-		}
-	}
+    /**
+     * Mismo que timprime mï¿½s un salto de lï¿½nea
+     */
+    protected final void timprimeln(String s) {
+        super.tprintln(s);
+    }
 
-	/**
-	 * Práctica 2 - Invocable por un proceso para recibir un mensaje
-	 */
-	public final void receive(int addr,byte[] message){
-		if (estaDisponible()){
-			timprimeln("solicita recepción bloqueante de mensaje.");
-			receiveVerdadero(addr,message);
-		}
-		else{
-			imprimeln("PROCESO NO REGISTRADO INTENTA RECIBIR MENSAJE");
-		}
-	}
+    /**
+     * Prï¿½ctica 2 - Para obtener de la interfaz grï¿½fica IP e ID del proceso
+     * destinatario
+     */
+    protected final ParMaquinaProceso dameDestinatarioDesdeInterfaz() {
+        return pmp;
+    }
 
-	/**
-	 * Práctica 2 - Devuelve true mientras el kernel no se le solicite cerrar desde la IG
-	 */
-	protected boolean seguirEsperandoDatagramas(){
-		return super.isWaitingForDatagrams();
-	}
+    /**
+     * Prï¿½ctica 2 - Socket para enviar datagramas
+     */
+    protected final DatagramSocket dameSocketEmision() {
+        return super.getSendSocket();
+    }
 
-	/**
-	 * Desde Práctica 1 - Detiene la ejecución de un Proceso 
-	 */
-	public final void suspenderProceso(){
-		super.suspendThread();
-	}
+    /**
+     * Prï¿½ctica 2 - Socket para recibir datagramas
+     */
+    protected final DatagramSocket dameSocketRecepcion() {
+        return super.getReceiveSocket();
+    }
 
-	/**
-	 * Desde Práctica 1 - Reanuda la ejecución de un Proceso
-	 */
-	public final void reanudarProceso(SystemThread t){
-		super.resumeThread(t);
-	}
-	
-	/**
-	 * Desde Práctica 2 - Devuelve el identificador único del proceso invocador
-	 */
-	public int dameIdProceso(){
-		return (int)super.getProcessID();
-	}
+    /**
+     * Prï¿½ctica 2 - Puerto para recibir mensajes
+     */
+    protected final int damePuertoRecepcion() {
+        return super.getReceivePort();
+    }
 
-	/**
-	 * Desde Práctica 6 - Devuelve el identificador único del hilo invocador
-	 */
-	public int dameIdHilo(){
-		return (int)super.getThreadID();
-	}
+    /**
+     * Prï¿½ctica 2 - devuelve distinto de null si el proceso des existe en esta
+     * mï¿½quina
+     */
+    protected final Proceso dameProcesoLocal(int dest) {
+        return (Proceso) super.getLocalThread(dest);
+    }
 
-	/**
-	 * Práctica 5 - Para envío no bloqueante de mensaje
-	 */
-	public final void sendNB(int dest,byte[] message){
-		if (estaDisponible()){
-			timprimeln("solicita envio no bloqueante de mensaje.");
-			sendNBVerdadero(dest,message);
-		}
-		else{
-			imprimeln("PROCESO NO REGISTRADO INTENTA ENVIAR MENSAJE");
-		}
-	}
+    /**
+     * Prï¿½ctica 2 - Invocado desde MicroKernelBase
+     */
+    protected final void sendImplemented(int dest, byte[] message) {
+        if (estaDisponible()) {
+            timprimeln("solicita envio bloqueante de mensaje.");
+            sendVerdadero(dest, message);
+        } else {
+            imprimeln("PROCESO NO REGISTRADO INTENTA ENVIAR MENSAJE");
+        }
+    }
 
-	/**
-	 * Práctica 5 - Para recepción no bloqueante de mensaje
-	 */
-	public final void receiveNB(int addr,byte[] message){
-		if (estaDisponible()){
-			timprimeln("solicita recepcion no bloqueante de mensaje.");
-			receiveNBVerdadero(addr,message);
-		}
-		else{
-			imprimeln("PROCESO NO REGISTRADO INTENTA RECIBIR MENSAJE");
-		}
-	}
-	
-	/**
-	 * Práctica 5 - Devuelva true si la inicialización de módulos:
-	 * Direccionamiento, Bloqueo, Almacenamiento y Confiabilidad ha sido exitosa
-	 */
-	protected abstract boolean iniciarModulos();
+    /**
+     * Prï¿½ctica 5 - Invocado desde MicroKernelBase
+     */
+    protected final void sendImplemented(String dest, byte[] message) {
+        if (estaDisponible()) {
+            timprimeln("solicita envio bloqueante de mensaje.");
+            sendVerdadero(dest, message);
+        } else {
+            imprimeln("PROCESO NO REGISTRADO INTENTA ENVIAR MENSAJE");
+        }
+    }
 
-	/**
-	 * Práctica 2 - A implementar por alumn@s
-	 */
-	protected abstract void sendVerdadero(int dest,byte[] message);
+    /**
+     * Prï¿½ctica 2 - Invocable por un proceso para recibir un mensaje
+     */
+    public final void receive(int addr, byte[] message) {
+        if (estaDisponible()) {
+            timprimeln("solicita recepciï¿½n bloqueante de mensaje.");
+            receiveVerdadero(addr, message);
+        } else {
+            imprimeln("PROCESO NO REGISTRADO INTENTA RECIBIR MENSAJE");
+        }
+    }
 
-	/**
-	 * Práctica 5 - A implementar por alumn@os
-	 */
-	protected abstract void sendVerdadero(String dest,byte[] message);
+    /**
+     * Prï¿½ctica 2 - Devuelve true mientras el kernel no se le solicite cerrar
+     * desde la IG
+     */
+    protected boolean seguirEsperandoDatagramas() {
+        return super.isWaitingForDatagrams();
+    }
 
-	/**
-	 * Práctica 2 - A implementar por alumn@s
-	 */
-	protected abstract void receiveVerdadero(int addr,byte[] message);
+    /**
+     * Desde Prï¿½ctica 1 - Detiene la ejecuciï¿½n de un Proceso
+     */
+    public final void suspenderProceso() {
+        super.suspendThread();
+    }
 
-	/**
-	 * Práctica 5 - A implementar optativamente por alumn@s
-	 */
-	protected abstract void sendNBVerdadero(int dest,byte[] message);
+    /**
+     * Desde Prï¿½ctica 1 - Reanuda la ejecuciï¿½n de un Proceso
+     */
+    public final void reanudarProceso(SystemThread t) {
+        super.resumeThread(t);
+    }
 
-	/**
-	 * Práctica 5 - A implementar optativamente por alumn@s
-	 */
-	protected abstract void receiveNBVerdadero(int addr,byte[] message);
+    /**
+     * Desde Prï¿½ctica 2 - Devuelve el identificador ï¿½nico del proceso invocador
+     */
+    public int dameIdProceso() {
+        return (int) super.getProcessID();
+    }
 
-	/**
-	 * Práctica 2 - A implementar por alumn@s
-	 */
-	public void run(){
-	}
+    /**
+     * Desde Prï¿½ctica 6 - Devuelve el identificador ï¿½nico del hilo invocador
+     */
+    public int dameIdHilo() {
+        return (int) super.getThreadID();
+    }
+
+    /**
+     * Prï¿½ctica 5 - Para envï¿½o no bloqueante de mensaje
+     */
+    public final void sendNB(int dest, byte[] message) {
+        if (estaDisponible()) {
+            timprimeln("solicita envio no bloqueante de mensaje.");
+            sendNBVerdadero(dest, message);
+        } else {
+            imprimeln("PROCESO NO REGISTRADO INTENTA ENVIAR MENSAJE");
+        }
+    }
+
+    /**
+     * Prï¿½ctica 5 - Para recepciï¿½n no bloqueante de mensaje
+     */
+    public final void receiveNB(int addr, byte[] message) {
+        if (estaDisponible()) {
+            timprimeln("solicita recepcion no bloqueante de mensaje.");
+            receiveNBVerdadero(addr, message);
+        } else {
+            imprimeln("PROCESO NO REGISTRADO INTENTA RECIBIR MENSAJE");
+        }
+    }
+
+    /**
+     * Prï¿½ctica 5 - Devuelva true si la inicializaciï¿½n de mï¿½dulos:
+     * Direccionamiento, Bloqueo, Almacenamiento y Confiabilidad ha sido exitosa
+     */
+    protected abstract boolean iniciarModulos();
+
+    /**
+     * Prï¿½ctica 2 - A implementar por alumn@s
+     */
+    protected abstract void sendVerdadero(int dest, byte[] message);
+
+    /**
+     * Prï¿½ctica 5 - A implementar por alumn@os
+     */
+    protected abstract void sendVerdadero(String dest, byte[] message);
+
+    /**
+     * Prï¿½ctica 2 - A implementar por alumn@s
+     */
+    protected abstract void receiveVerdadero(int addr, byte[] message);
+
+    /**
+     * Prï¿½ctica 5 - A implementar optativamente por alumn@s
+     */
+    protected abstract void sendNBVerdadero(int dest, byte[] message);
+
+    /**
+     * Prï¿½ctica 5 - A implementar optativamente por alumn@s
+     */
+    protected abstract void receiveNBVerdadero(int addr, byte[] message);
+
+    /**
+     * Prï¿½ctica 2 - A implementar por alumn@s
+     */
+    public void run() {
+    }
 
 }

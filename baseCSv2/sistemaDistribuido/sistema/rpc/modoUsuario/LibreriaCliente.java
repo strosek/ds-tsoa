@@ -7,20 +7,19 @@ import sistemaDistribuido.util.Escribano;
 
 public class LibreriaCliente extends Libreria {
 
-	public LibreriaCliente(Escribano esc) {
-		super(esc);
-	}
-	
+    public LibreriaCliente(Escribano esc) {
+        super(esc);
+    }
 
-	/**
-	 * Ejemplo de resguardo del cliente suma
-	 */
-	protected void suma() {
-		int asaDest=0;
+    /**
+     * Ejemplo de resguardo del cliente suma
+     */
+    protected void suma() {
+        int asaDest = 0;
 
-		//para pr�ctica 4
-		// asaDest=RPC.importarInterfaz(nombreServidor, version)
-		Nucleo.send(asaDest,null);
-	}
+        // para pr�ctica 4
+        // asaDest=RPC.importarInterfaz(nombreServidor, version)
+        Nucleo.send(asaDest, null);
+    }
 
 }
