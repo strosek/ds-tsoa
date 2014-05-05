@@ -15,7 +15,6 @@ public abstract class Libreria {
     protected void imprime(String s) {
         esc.imprime(s);
     }
-
     protected void imprimeln(String s) {
         esc.imprimeln(s);
     }
@@ -25,27 +24,23 @@ public abstract class Libreria {
      * esta disponible como interfaz al usuario programador
      */
 
-    /**
-     * Servidor suma verdadera generable por un compilador estandar o resguardo
-     * de la misma por un compilador de resguardos.
-     */
-    protected abstract void suma();
+    protected abstract void summation();
+    protected abstract void max();
+    protected abstract void min();
+    protected abstract void cube();
 
-    public int summation(int[] m_summationArgs) {
-        // TODO: Poner en la pila y hacer llamada a libreria implementadora.
-        imprimeln("Resultado : ");
-        return 0;
+    protected int getParameterFromStack() {
+        return m_parametersStack.pop().intValue();
     }
 
-    public int max(int[] m_maxArgs) {
-        return 0;
-    }
+    protected int[] getParametersFromStack() {
+        int nParameters = m_parametersStack.pop().intValue();
 
-    public int min(int[] m_minArgs) {
-        return 0;
-    }
+        int[] parameters = new int[nParameters];
+        for (int i = 0; i < nParameters; ++i) {
+            parameters[i] = m_parametersStack.pop().intValue();
+        }
 
-    public int cube(int m_cubeArg) {
-        return 0;
+        return parameters;
     }
 }

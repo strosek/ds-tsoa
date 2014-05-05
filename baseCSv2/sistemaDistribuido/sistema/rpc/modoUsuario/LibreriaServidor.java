@@ -58,11 +58,4 @@ public class LibreriaServidor extends Libreria {
         return a * a * a;
     }
 
-    private int getParameterFromStack() {
-        return 0;
-    }
-
-    private int[] getParametersFromStack() {
-        return null;
-    }
 }
