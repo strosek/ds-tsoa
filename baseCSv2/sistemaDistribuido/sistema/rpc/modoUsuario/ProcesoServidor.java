@@ -36,16 +36,22 @@ public class ProcesoServidor extends Proceso {
             int destination = IntByteConverter.toInt(Arrays.copyOfRange(
                     m_requestBuffer, 0, IntByteConverter.SIZE_INT));
             parameters = unpackParameters();
+            int result = 0;
             switch (m_requestBuffer[Libreria.INDEX_OPCODE]) {
             case Libreria.OPCODE_SUMMATION :
+                result = m_serverLib.summation(parameters);
                 break;
             case Libreria.OPCODE_MAX :
+                result = m_serverLib.max(parameters);
                 break;
             case Libreria.OPCODE_MIN :
+                result = m_serverLib.min(parameters);
                 break;
             case Libreria.OPCODE_CUBE :
+                result = m_serverLib.cube(parameters[0]);
                 break;
             }
+            packResult(result);
 
             Nucleo.send(destination, m_responseBuffer);
         }
@@ -56,8 +62,22 @@ public class ProcesoServidor extends Proceso {
     private int[] unpackParameters() {
         int nParameters = m_requestBuffer[Libreria.INDEX_DATALENGTH];
         int[] parameters = new int[nParameters];
+        int firstByte = Libreria.INDEX_DATA;
+        int lastByte;
         for (int i = 0; i < nParameters; ++i) {
-            
+            firstByte += i * IntByteConverter.SIZE_INT;
+            lastByte = firstByte + IntByteConverter.SIZE_INT;
+            parameters[i] = IntByteConverter.toInt(Arrays.copyOfRange(
+                    m_requestBuffer, firstByte, lastByte));
+        }
+        
+        return parameters;
+    }
+    private void packResult(int result) {
+        m_responseBuffer[Libreria.INDEX_DATALENGTH] = 1;
+        byte[] parameterBytes = IntByteConverter.toBytes(result);
+        for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+            m_responseBuffer[Libreria.INDEX_DATA + i] = parameterBytes[i];
         }
     }
 }

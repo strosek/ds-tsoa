@@ -20,10 +20,10 @@ public class ProcesoCliente extends Proceso {
         super(esc);
 
         // primero debe funcionar con esta para subrutina servidor local
-        m_mathLib = new LibreriaServidor(esc);
+        //m_mathLib = new LibreriaServidor(esc);
 
         // luego con esta comentando la anterior, para subrutina servidor remota
-        // m_mathLib = new LibreriaCliente(esc);
+        m_mathLib = new LibreriaCliente(esc);
 
         start();
     }
@@ -49,16 +49,16 @@ public class ProcesoCliente extends Proceso {
 
         int result;
         result = m_mathLib.summation(m_summationArgs);
-        imprimeln("Resultado sumatoria: ");
+        imprimeln("Resultado sumatoria: " + result);
         
         result = m_mathLib.max(m_maxArgs);
-        imprimeln("Resultado maximo: ");
+        imprimeln("Resultado maximo: " + result);
         
         result = m_mathLib.min(m_minArgs);
-        imprimeln("Resultado minimio: ");
+        imprimeln("Resultado minimio: " + result);
         
         result = m_mathLib.cube(m_cubeArg);
-        imprimeln("Resultado cubo: ");
+        imprimeln("Resultado cubo: " + result);
 
         imprimeln("Fin del cliente.");
     }

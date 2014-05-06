@@ -25,6 +25,7 @@ public abstract class Libreria {
     private Escribano        esc;
 
     public Libreria(Escribano esc) {
+        m_parametersStack = new Stack<Integer>();
         this.esc = esc;
     }
 
@@ -39,6 +40,37 @@ public abstract class Libreria {
     protected abstract void max();
     protected abstract void min();
     protected abstract void cube();
+    
+    public int summation(int[] addends) {
+        for (int i = 0; i < addends.length; ++i) {
+            m_parametersStack.push(Integer.valueOf(addends[i]));
+        }
+        m_parametersStack.push(Integer.valueOf(addends.length));
+        summation();
+        return getResultFromStack();
+    }
+    public int max(int[] numbers) {
+        for (int i = 0; i < numbers.length; ++i) {
+            m_parametersStack.push(Integer.valueOf(numbers[i]));
+        }
+        m_parametersStack.push(Integer.valueOf(numbers.length));
+        max();
+        return getResultFromStack();
+    }
+    public int min(int[] numbers) {
+        for (int i = 0; i < numbers.length; ++i) {
+            m_parametersStack.push(Integer.valueOf(numbers[i]));
+        }
+        m_parametersStack.push(Integer.valueOf(numbers.length));
+        summation();
+        return getResultFromStack();
+    }
+    public int cube(int number) {
+        m_parametersStack.push(Integer.valueOf(number));
+        m_parametersStack.push(Integer.valueOf(1));
+        summation();
+        return getResultFromStack();
+    }
 
     protected int[] getParametersFromStack() {
         int nParameters = m_parametersStack.pop().intValue();
@@ -49,5 +81,9 @@ public abstract class Libreria {
         }
 
         return parameters;
+    }
+    private int getResultFromStack() {
+        m_parametersStack.pop();
+        return m_parametersStack.pop().intValue();
     }
 }

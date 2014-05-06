@@ -71,7 +71,7 @@ public class LibreriaCliente extends Libreria {
             }
         }
     }
-    
+
     private int unpackResponse() {
         return IntByteConverter.toInt(Arrays.copyOfRange(m_responseBuffer,
                 INDEX_DATA, INDEX_DATA + IntByteConverter.SIZE_INT));

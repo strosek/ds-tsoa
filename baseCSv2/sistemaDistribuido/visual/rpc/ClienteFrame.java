@@ -1,3 +1,8 @@
+/* Modificado para practica 3.
+ * 
+ * Erick Daniel Corona Garcia. 210224314. TSOA03.
+ */
+
 package sistemaDistribuido.visual.rpc;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
