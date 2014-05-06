@@ -50,13 +50,13 @@ public class ProcesoCliente extends Proceso {
         int result;
         result = m_mathLib.summation(m_summationArgs);
         imprimeln("Resultado sumatoria: " + result);
-        
+
         result = m_mathLib.max(m_maxArgs);
         imprimeln("Resultado maximo: " + result);
         
         result = m_mathLib.min(m_minArgs);
         imprimeln("Resultado minimio: " + result);
-        
+
         result = m_mathLib.cube(m_cubeArg);
         imprimeln("Resultado cubo: " + result);
 

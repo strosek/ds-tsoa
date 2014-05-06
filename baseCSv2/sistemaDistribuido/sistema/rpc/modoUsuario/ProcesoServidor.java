@@ -21,6 +21,8 @@ public class ProcesoServidor extends Proceso {
     public ProcesoServidor(Escribano esc) {
         super(esc);
         m_serverLib = new LibreriaServidor(esc);
+        m_requestBuffer = new byte[Libreria.SIZE_PACKET];
+        m_responseBuffer = new byte[Libreria.SIZE_PACKET];
         start();
     }
 
@@ -29,7 +31,6 @@ public class ProcesoServidor extends Proceso {
         imprimeln("Proceso servidor en ejecucion.");
         // idUnico=RPC.exportarInterfaz("FileServer", "3.1", asa) //para practica 4
 
-        m_requestBuffer = new byte[Libreria.SIZE_PACKET];
         int[] parameters;
         while (continuar()) {
             Nucleo.receive(dameID(), m_requestBuffer);

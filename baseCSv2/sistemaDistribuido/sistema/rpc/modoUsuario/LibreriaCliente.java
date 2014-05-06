@@ -32,6 +32,7 @@ public class LibreriaCliente extends Libreria {
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
+        m_parametersStack.push(Integer.valueOf(1));
     }
     public void max() {
         packParameters();
@@ -40,6 +41,7 @@ public class LibreriaCliente extends Libreria {
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
+        m_parametersStack.push(Integer.valueOf(1));
     }
     public void min() {
         packParameters();
@@ -48,6 +50,7 @@ public class LibreriaCliente extends Libreria {
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
+        m_parametersStack.push(Integer.valueOf(1));
     }
     public void cube() {
         packParameters();
@@ -56,6 +59,7 @@ public class LibreriaCliente extends Libreria {
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
+        m_parametersStack.push(Integer.valueOf(1));
     }
 
     private void packParameters() {
