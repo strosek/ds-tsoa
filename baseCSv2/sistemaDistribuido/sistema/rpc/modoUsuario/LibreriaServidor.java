@@ -9,27 +9,18 @@ public class LibreriaServidor extends Libreria {
         super(esc);
     }
 
-    /**
-     * Ejemplo de servidor suma verdadera
-     */
-    protected void suma() {
-        // saca parametros de pila
 
-        // devuelve valor izquierdo
-    }
-
-    public int summation() {
+    public void summation() {
         int[] addends = getParametersFromStack();
         int sum = 0;
 
         for (int i = 0; i < addends.length; ++i) {
             sum += addends[i];
         }
-
-        return sum;
+        m_parametersStack.push(Integer.valueOf(sum));
+        m_parametersStack.push(Integer.valueOf(1)); // Size of result
     }
-
-    public int max() {
+    public void max() {
         int[] numbers = getParametersFromStack();
         int max = numbers[0];
         for (int i = 1; i < numbers.length; ++i) {
@@ -37,11 +28,10 @@ public class LibreriaServidor extends Libreria {
                 max = numbers[i];
             }
         }
-
-        return max;
+        m_parametersStack.push(Integer.valueOf(max));
+        m_parametersStack.push(Integer.valueOf(1)); // Size of result
     }
-
-    public int min() {
+    public void min() {
         int[] numbers = getParametersFromStack();
         int min = numbers[0];
         for (int i = 1; i < numbers.length; ++i) {
@@ -49,13 +39,12 @@ public class LibreriaServidor extends Libreria {
                 min = numbers[i];
             }
         }
-
-        return min;
+        m_parametersStack.push(Integer.valueOf(min));
+        m_parametersStack.push(Integer.valueOf(1)); // Size of result
     }
-
-    public int cube() {
-        int a = getParameterFromStack();
-        return a * a * a;
+    public void cube() {
+        int[] a = getParametersFromStack();
+        m_parametersStack.push(Integer.valueOf(a[0] * a[0] * a[0]));
+        m_parametersStack.push(Integer.valueOf(1)); // Size of result
     }
-
 }
