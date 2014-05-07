@@ -66,14 +66,17 @@ public class ProcesoServidor extends Proceso {
         int nParameters = m_requestBuffer[Libreria.INDEX_DATALENGTH];
         System.out.println("procesoServidor: nParameters " + nParameters);
         int[] parameters = new int[nParameters];
+
         int firstByte = Libreria.INDEX_DATA;
-        int lastByte;
+        int lastByte = firstByte + IntByteConverter.SIZE_INT;
         for (int i = 0; i < nParameters; ++i) {
-            firstByte += i * IntByteConverter.SIZE_INT;
-            lastByte = firstByte + IntByteConverter.SIZE_INT;
+            System.out.println("procesoServidor: unpack firstbyte " + firstByte + " lastbyte " + lastByte);
             parameters[i] = IntByteConverter.toInt(Arrays.copyOfRange(
                     m_requestBuffer, firstByte, lastByte));
-            System.out.println("procesoServidor: prameter " + i + " " + parameters[i]);
+            System.out.println("procesoServidor: unpacked parameter " + i + " " + parameters[i]);
+
+            firstByte += IntByteConverter.SIZE_INT;
+            lastByte = firstByte + IntByteConverter.SIZE_INT;
         }
 
         return parameters;

@@ -66,6 +66,7 @@ public class LibreriaCliente extends Libreria {
         int nParameters = m_parametersStack.pop().intValue();
         m_requestBuffer[INDEX_DATALENGTH] = (byte)nParameters;
         for (int i = nParameters - 1; i >= 0; --i) {
+            System.out.println("libCliente: pack parameter " + m_parametersStack.peek());
             byte[] parameterBytes = IntByteConverter.toBytes(
                     m_parametersStack.pop().intValue());
             for (int j = 0; j < IntByteConverter.SIZE_INT; ++j) {
