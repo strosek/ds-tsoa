@@ -65,15 +65,4 @@ public class IntByteConverter {
 
         return someBytes;
     }
-
-    public static void main(String[] args) {
-        byte[] theIntBytes = toBytes(0x7F0F0AFF);
-        System.out.print("|");
-        for (int i = 0; i < SIZE_INT; ++i) {
-            System.out.print(theIntBytes[i] + "|");
-        }
-        System.out.println();
-
-        System.out.println(toInt(new byte[] { 0x7F, 0x0F, 0x0A, (byte) 0xFF }));
-    }
 }

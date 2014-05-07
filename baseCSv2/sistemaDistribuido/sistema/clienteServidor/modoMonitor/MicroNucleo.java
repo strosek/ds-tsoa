@@ -152,12 +152,6 @@ public final class MicroNucleo extends MicroNucleoBase {
 
                 imprimeln("Buscando proceso correspondiente al campo recibido");
                 process = nucleo.dameProcesoLocal(destination);
-                if (packet.getData()[ProcesoServidor.INDEX_STATUS] == ProcesoServidor.STATUS_AU) {
-                    imprimeln("Enviando AU. Servidor desconocido.");
-                    nucleo.reanudarProceso(process);
-                    continue;
-                }
-
                 if (process != null) {
                     if (m_receptionTable.containsKey(destination)) {
                         byte[] array = m_receptionTable.get(destination);
@@ -170,10 +164,19 @@ public final class MicroNucleo extends MicroNucleoBase {
                         m_receptionTable.remove(destination);
                         nucleo.reanudarProceso(process);
                     }
-                } else {
+                }
+                else {
                     imprimeln("Proceso distinatario no encontrado segun el "
                             + "campo dest recibido");
-                    buffer[ProcesoServidor.INDEX_STATUS] = (byte) ProcesoServidor.STATUS_AU;
+                    buffer[ProcesoServidor.INDEX_STATUS] = 
+                            (byte)ProcesoServidor.STATUS_AU;
+
+                    byte[] originBytes = IntByteConverter.toBytes(origin);
+                    byte[] destinationBytes = IntByteConverter.toBytes(destination);
+                    for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+                        buffer[ProcesoCliente.INDEX_ORIGIN + i] = destinationBytes[i];
+                        buffer[ProcesoCliente.INDEX_DESTINATION + i] = originBytes[i];
+                    }
                     packet = new DatagramPacket(buffer, buffer.length,
                             InetAddress.getByName(originIp),
                             nucleo.damePuertoRecepcion());

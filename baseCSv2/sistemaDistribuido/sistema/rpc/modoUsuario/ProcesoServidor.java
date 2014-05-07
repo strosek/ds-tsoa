@@ -33,6 +33,7 @@ public class ProcesoServidor extends Proceso {
 
         int[] parameters;
         while (continuar()) {
+            imprimeln("Invocando a receive.");
             Nucleo.receive(dameID(), m_requestBuffer);
             int destination = IntByteConverter.toInt(Arrays.copyOfRange(
                     m_requestBuffer, 0, IntByteConverter.SIZE_INT));
@@ -54,14 +55,16 @@ public class ProcesoServidor extends Proceso {
             }
             packResult(result);
 
+            imprimeln("Enviando respuesta.");
             Nucleo.send(destination, m_responseBuffer);
         }
 
         // RPC.deregistrarInterfaz(nombreServidor, version, idUnico) //para practica 4
     }
-    
+
     private int[] unpackParameters() {
         int nParameters = m_requestBuffer[Libreria.INDEX_DATALENGTH];
+        System.out.println("procesoServidor: nParameters " + nParameters);
         int[] parameters = new int[nParameters];
         int firstByte = Libreria.INDEX_DATA;
         int lastByte;
@@ -70,8 +73,9 @@ public class ProcesoServidor extends Proceso {
             lastByte = firstByte + IntByteConverter.SIZE_INT;
             parameters[i] = IntByteConverter.toInt(Arrays.copyOfRange(
                     m_requestBuffer, firstByte, lastByte));
+            System.out.println("procesoServidor: prameter " + i + " " + parameters[i]);
         }
-        
+
         return parameters;
     }
     private void packResult(int result) {
