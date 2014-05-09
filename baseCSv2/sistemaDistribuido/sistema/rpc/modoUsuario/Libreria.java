@@ -44,10 +44,8 @@ public abstract class Libreria {
     public int summation(int[] addends) {
         for (int i = 0; i < addends.length; ++i) {
             m_parametersStack.push(Integer.valueOf(addends[i]));
-            System.out.println("libreria: stack push " + m_parametersStack.peek());
         }
         m_parametersStack.push(Integer.valueOf(addends.length));
-        System.out.println("libreria: stack push " + m_parametersStack.peek());
         summation();
         return getResultFromStack();
     }
@@ -64,13 +62,13 @@ public abstract class Libreria {
             m_parametersStack.push(Integer.valueOf(numbers[i]));
         }
         m_parametersStack.push(Integer.valueOf(numbers.length));
-        summation();
+        min();
         return getResultFromStack();
     }
     public int cube(int number) {
         m_parametersStack.push(Integer.valueOf(number));
         m_parametersStack.push(Integer.valueOf(1));
-        summation();
+        cube();
         return getResultFromStack();
     }
 
@@ -79,7 +77,6 @@ public abstract class Libreria {
 
         int[] parameters = new int[nParameters];
         for (int i = 0; i < nParameters; ++i) {
-            System.out.println("libreria: stack " + m_parametersStack.peek());
             parameters[i] = m_parametersStack.pop().intValue();
         }
 

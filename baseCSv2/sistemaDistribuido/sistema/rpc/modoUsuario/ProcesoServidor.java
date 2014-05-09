@@ -21,8 +21,7 @@ public class ProcesoServidor extends Proceso {
     public ProcesoServidor(Escribano esc) {
         super(esc);
         m_serverLib = new LibreriaServidor(esc);
-        m_requestBuffer = new byte[Libreria.SIZE_PACKET];
-        m_responseBuffer = new byte[Libreria.SIZE_PACKET];
+
         start();
     }
 
@@ -34,6 +33,7 @@ public class ProcesoServidor extends Proceso {
         int[] parameters;
         while (continuar()) {
             imprimeln("Invocando a receive.");
+            m_requestBuffer = new byte[Libreria.SIZE_PACKET];
             Nucleo.receive(dameID(), m_requestBuffer);
             int destination = IntByteConverter.toInt(Arrays.copyOfRange(
                     m_requestBuffer, 0, IntByteConverter.SIZE_INT));
@@ -41,18 +41,23 @@ public class ProcesoServidor extends Proceso {
             int result = 0;
             switch (m_requestBuffer[Libreria.INDEX_OPCODE]) {
             case Libreria.OPCODE_SUMMATION :
+                imprimeln("Realizando operacion sumatoria");
                 result = m_serverLib.summation(parameters);
                 break;
             case Libreria.OPCODE_MAX :
+                imprimeln("Realizando operacion max");
                 result = m_serverLib.max(parameters);
                 break;
             case Libreria.OPCODE_MIN :
+                imprimeln("Realizando operacion min");
                 result = m_serverLib.min(parameters);
                 break;
             case Libreria.OPCODE_CUBE :
+                imprimeln("Realizando operacion cubo");
                 result = m_serverLib.cube(parameters[0]);
                 break;
             }
+
             packResult(result);
 
             imprimeln("Enviando respuesta.");
@@ -64,16 +69,13 @@ public class ProcesoServidor extends Proceso {
 
     private int[] unpackParameters() {
         int nParameters = m_requestBuffer[Libreria.INDEX_DATALENGTH];
-        System.out.println("procesoServidor: nParameters " + nParameters);
         int[] parameters = new int[nParameters];
 
         int firstByte = Libreria.INDEX_DATA;
         int lastByte = firstByte + IntByteConverter.SIZE_INT;
         for (int i = 0; i < nParameters; ++i) {
-            System.out.println("procesoServidor: unpack firstbyte " + firstByte + " lastbyte " + lastByte);
             parameters[i] = IntByteConverter.toInt(Arrays.copyOfRange(
                     m_requestBuffer, firstByte, lastByte));
-            System.out.println("procesoServidor: unpacked parameter " + i + " " + parameters[i]);
 
             firstByte += IntByteConverter.SIZE_INT;
             lastByte = firstByte + IntByteConverter.SIZE_INT;
@@ -82,6 +84,7 @@ public class ProcesoServidor extends Proceso {
         return parameters;
     }
     private void packResult(int result) {
+        m_responseBuffer = new byte[Libreria.SIZE_PACKET];
         m_responseBuffer[Libreria.INDEX_DATALENGTH] = 1;
         byte[] parameterBytes = IntByteConverter.toBytes(result);
         for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {

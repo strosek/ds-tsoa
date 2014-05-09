@@ -8,6 +8,7 @@ package sistemaDistribuido.sistema.rpc.modoUsuario;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
+import sistemaDistribuido.util.Pausador;
 
 public class ProcesoCliente extends Proceso {
     private Libreria m_mathLib;
@@ -18,9 +19,6 @@ public class ProcesoCliente extends Proceso {
 
     public ProcesoCliente(Escribano esc) {
         super(esc);
-
-        // primero debe funcionar con esta para subrutina servidor local
-        //m_mathLib = new LibreriaServidor(esc);
 
         // luego con esta comentando la anterior, para subrutina servidor remota
         m_mathLib = new LibreriaCliente(esc);
@@ -50,12 +48,15 @@ public class ProcesoCliente extends Proceso {
         int result;
         result = m_mathLib.summation(m_summationArgs);
         imprimeln("Resultado sumatoria: " + result);
+        Pausador.pausa(500);
 
         result = m_mathLib.max(m_maxArgs);
         imprimeln("Resultado maximo: " + result);
+        Pausador.pausa(500);
         
         result = m_mathLib.min(m_minArgs);
         imprimeln("Resultado minimio: " + result);
+        Pausador.pausa(500);
 
         result = m_mathLib.cube(m_cubeArg);
         imprimeln("Resultado cubo: " + result);

@@ -21,9 +21,7 @@ public class LibreriaServidor extends Libreria {
 
         for (int i = 0; i < addends.length; ++i) {
             sum += addends[i];
-            System.out.println("libreriaServidor: parameter " + i + " "+ addends[i]);
         }
-        System.out.println("libreriaServidor: result " + sum);
         m_parametersStack.push(Integer.valueOf(sum));
         m_parametersStack.push(Integer.valueOf(1)); // Size of result
     }
