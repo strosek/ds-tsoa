@@ -1,14 +1,16 @@
-/* Modificado para practica 3.
+/* Modificado para practica 4.
  * 
  * Erick Daniel Corona Garcia. 210224314. TSOA03.
  */
 
 package sistemaDistribuido.sistema.rpc.modoUsuario;
 
-//import sistemaDistribuido.sistema.rpc.modoMonitor.RPC;   //para practica 4
 import java.util.Arrays;
 
+import sistemaDistribuido.sistema.rpc.modoMonitor.RPC;
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MachineProcessPair;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.ParMaquinaProceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
 import sistemaDistribuido.util.IntByteConverter;
@@ -28,7 +30,12 @@ public class ProcesoServidor extends Proceso {
      // Resguardo del servidor
     public void run() {
         imprimeln("Proceso servidor en ejecucion.");
-        // idUnico=RPC.exportarInterfaz("FileServer", "3.1", asa) //para practica 4
+
+        // TODO: get a real handle
+        ParMaquinaProceso handle = new MachineProcessPair();
+        String serverName = "FileServer";
+        String serverVersion = "2000";
+        int uniqueId = RPC.exportarInterfaz(serverName, serverVersion, handle);
 
         int[] parameters;
         while (continuar()) {
@@ -64,7 +71,7 @@ public class ProcesoServidor extends Proceso {
             Nucleo.send(destination, m_responseBuffer);
         }
 
-        // RPC.deregistrarInterfaz(nombreServidor, version, idUnico) //para practica 4
+        RPC.deregistrarInterfaz(serverName, serverVersion, uniqueId);
     }
 
     private int[] unpackParameters() {

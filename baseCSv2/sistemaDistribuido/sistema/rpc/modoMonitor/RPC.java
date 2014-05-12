@@ -1,18 +1,20 @@
+/* Modificado para practica 4.
+ * 
+ * Erick Daniel Corona Garcia. 210224314. TSOA03.
+ */
+
 package sistemaDistribuido.sistema.rpc.modoMonitor;
 
-//import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;   //para pr�ctica 4
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.ParMaquinaProceso;
 import sistemaDistribuido.sistema.rpc.modoUsuario.ProgramaConector;
 
 public class RPC {
-    private static ProgramaConector conector;
+    private static ProgramaConector m_connector;
 
-    /**
-	 * 
-	 */
     public static void asignarConector(ProgramaConector con) {
-        conector = con;
-        conector.inicializar();
+        m_connector = con;
+        m_connector.inicializar();
     }
 
     /**
@@ -29,9 +31,8 @@ public class RPC {
      * identificacionUnica para el deregistro.
      */
     public static int exportarInterfaz(String nombreServidor, String version,
-            ParMaquinaProceso asa) {
-        // conector.registro(nombreServidor,version,asa);
-        return 0;
+                                       ParMaquinaProceso asa) {
+        return m_connector.registro(nombreServidor, version, asa);
     }
 
     /**

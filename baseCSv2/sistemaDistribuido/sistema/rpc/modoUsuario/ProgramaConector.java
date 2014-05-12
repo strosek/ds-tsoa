@@ -1,27 +1,31 @@
+/* Modificado para practica 4.
+ * 
+ * Erick Daniel Corona Garcia. 210224314. TSOA03.
+ */
+
 package sistemaDistribuido.sistema.rpc.modoUsuario;
 
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.ParMaquinaProceso;
 import sistemaDistribuido.visual.rpc.DespleganteConexiones;
+
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Iterator;
 
 public class ProgramaConector {
-    private DespleganteConexiones desplegante;
-    private Hashtable<Object, Object> conexiones; // las llaves que provee
-                                                  // DespleganteConexiones
+    private DespleganteConexiones m_display;
+    // Llaves que provee DespleganteConexiones
+    private Hashtable<Integer, Object> m_conections;
 
-    /**
-	 * 
-	 */
     public ProgramaConector(DespleganteConexiones desplegante) {
-        this.desplegante = desplegante;
+        this.m_display = desplegante;
     }
 
     /**
      * Inicializar tablas en programa conector
      */
     public void inicializar() {
-        conexiones = new Hashtable<Object, Object>();
+        m_conections = new Hashtable<Integer, Object>();
     }
 
     /**
@@ -29,10 +33,10 @@ public class ProgramaConector {
      * conexiones
      */
     private void removerConexiones() {
-        Set<Object> s = conexiones.keySet();
-        Iterator<Object> i = s.iterator();
+        Set<Integer> s = m_conections.keySet();
+        Iterator<Integer> i = s.iterator();
         while (i.hasNext()) {
-            desplegante.removerServidor(((Integer) i.next()).intValue());
+            m_display.removerServidor((i.next()).intValue());
             i.remove();
         }
     }
@@ -42,6 +46,11 @@ public class ProgramaConector {
      */
     public void terminar() {
         removerConexiones();
-        desplegante.finalizar();
+        m_display.finalizar();
+    }
+
+    public int registro(String serverName, String serverVersion,
+                        ParMaquinaProceso handle) {
+        return 0;
     }
 }
