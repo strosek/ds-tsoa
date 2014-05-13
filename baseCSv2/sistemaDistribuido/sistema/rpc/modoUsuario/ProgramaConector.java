@@ -6,6 +6,7 @@
 package sistemaDistribuido.sistema.rpc.modoUsuario;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.ParMaquinaProceso;
+import sistemaDistribuido.sistema.rpc.modoMonitor.ServerData;
 import sistemaDistribuido.visual.rpc.DespleganteConexiones;
 
 import java.util.Hashtable;
@@ -15,7 +16,7 @@ import java.util.Iterator;
 public class ProgramaConector {
     private DespleganteConexiones m_display;
     // Llaves que provee DespleganteConexiones
-    private Hashtable<Integer, Object> m_conections;
+    private Hashtable<Integer, ServerData> m_connections;
 
     public ProgramaConector(DespleganteConexiones desplegante) {
         this.m_display = desplegante;
@@ -25,7 +26,7 @@ public class ProgramaConector {
      * Inicializar tablas en programa conector
      */
     public void inicializar() {
-        m_conections = new Hashtable<Integer, Object>();
+        m_connections = new Hashtable<Integer, ServerData>();
     }
 
     /**
@@ -33,7 +34,7 @@ public class ProgramaConector {
      * conexiones
      */
     private void removerConexiones() {
-        Set<Integer> s = m_conections.keySet();
+        Set<Integer> s = m_connections.keySet();
         Iterator<Integer> i = s.iterator();
         while (i.hasNext()) {
             m_display.removerServidor((i.next()).intValue());
@@ -51,6 +52,17 @@ public class ProgramaConector {
 
     public int registro(String serverName, String serverVersion,
                         ParMaquinaProceso handle) {
-        return 0;
+        int uniqueId = m_display.agregarServidor(serverName, serverVersion,
+                handle.dameIP(), Integer.toString(handle.dameID()));
+        m_connections.put(Integer.valueOf(uniqueId), new ServerData(serverName, 
+                serverVersion, handle, uniqueId));
+
+        return uniqueId;
+    }
+
+    public boolean deregistro(String nombreServidor, String version,
+            int identificacionUnica) {
+        boolean isServerRemoved = false;
+        return isServerRemoved;
     }
 }

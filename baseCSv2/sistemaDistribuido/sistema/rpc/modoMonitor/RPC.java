@@ -21,26 +21,35 @@ public class RPC {
      * Efectua la llamada de busqueda en el conector. Regresa un dest para la
      * llamada a send(dest,message).
      */
-    public static int importarInterfaz(String nombreServidor, String version) {
+    public static int importarInterfaz(String name, String version) {
         // asa=conector.busqueda()
         return 0;
     }
 
     /**
      * Efectua la llamada a registro en el conector. Regresa una
-     * identificacionUnica para el deregistro.
+     * uniqueId para el deregistro.
      */
-    public static int exportarInterfaz(String nombreServidor, String version,
+    public static int exportarInterfaz(String name, String version,
                                        ParMaquinaProceso asa) {
-        return m_connector.registro(nombreServidor, version, asa);
+        return m_connector.registro(name, version, asa);
     }
 
     /**
      * Efectua la llamada a deregistro en el conector. Regresa el status del
      * deregistro, true significa llevado a cabo.
      */
-    public static boolean deregistrarInterfaz(String nombreServidor,
-            String version, int identificacionUnica) {
-        return true;
+    public static boolean deregistrarInterfaz(String name, String version,
+                                              int uniqueId) {
+        boolean isServerRemoved = m_connector.deregistro(name, version,
+                                                         uniqueId);
+        // TODO define a place to put this code.
+//        if (isServerRemoved) {
+//            Nucleo.imprimenl("Exito removiendo el servidor: " + uniqueId);
+//        }
+//        else {
+//            Nucleo.imprimenl("Error removiendo el servidor: " + uniqueId);
+//        }
+        return isServerRemoved;
     }
 }
