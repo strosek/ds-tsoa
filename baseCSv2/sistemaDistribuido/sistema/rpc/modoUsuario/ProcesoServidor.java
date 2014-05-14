@@ -33,8 +33,8 @@ public class ProcesoServidor extends Proceso {
 
         // TODO: get a real handle
         ParMaquinaProceso handle = new MachineProcessPair();
-        String serverName = "FileServer";
-        String serverVersion = "2000";
+        String serverName = "CandyServer";
+        String serverVersion = "1.1";
         int uniqueId = RPC.exportarInterfaz(serverName, serverVersion, handle);
 
         int[] parameters;

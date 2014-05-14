@@ -9,13 +9,13 @@ import sistemaDistribuido.sistema.clienteServidor.modoMonitor.ParMaquinaProceso;
 import sistemaDistribuido.sistema.rpc.modoMonitor.ServerData;
 import sistemaDistribuido.visual.rpc.DespleganteConexiones;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Iterator;
 
 public class ProgramaConector {
     private DespleganteConexiones m_display;
-    // Llaves que provee DespleganteConexiones
     private Hashtable<Integer, ServerData> m_connections;
 
     public ProgramaConector(DespleganteConexiones desplegante) {
@@ -60,9 +60,39 @@ public class ProgramaConector {
         return uniqueId;
     }
 
-    public boolean deregistro(String nombreServidor, String version,
-            int identificacionUnica) {
+    public boolean deregistro(String name, String version, int uniqueId) {
         boolean isServerRemoved = false;
+
+        ServerData server;
+        Enumeration<ServerData> servers = m_connections.elements();
+        while (servers.hasMoreElements() && !isServerRemoved) {
+            server = servers.nextElement();
+            if (server.getName().equals(name) &&
+                server.getVersion().equals(version)) {
+                m_connections.remove(uniqueId);
+                m_display.removerServidor(uniqueId);
+                isServerRemoved = true;
+            }
+        }
+
         return isServerRemoved;
+    }
+
+    public ParMaquinaProceso busqueda(String name, String version) {
+        ParMaquinaProceso result = null;
+
+        boolean isServerFound = false;
+        ServerData server;
+        Enumeration<ServerData> servers = m_connections.elements();
+        while (servers.hasMoreElements() && !isServerFound) {
+            server = servers.nextElement();
+            if (server.getName().equals(name) &&
+                server.getVersion().equals(version)) {
+                result = server.getHandle();
+                isServerFound = true;
+            }
+        }
+
+        return result;
     }
 }

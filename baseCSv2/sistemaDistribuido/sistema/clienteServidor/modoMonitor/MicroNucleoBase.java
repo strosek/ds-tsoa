@@ -131,7 +131,7 @@ public abstract class MicroNucleoBase extends MicroKernelBase {
     /**
      * Imprime texto m�s un salto de l�nea
      */
-    protected final void imprimeln(String s) {
+    public final void imprimeln(String s) {
         super.println(s);
     }
 

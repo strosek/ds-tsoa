@@ -1,11 +1,11 @@
-/* Modificado para practica 3.
+/* Modificado para practica 4.
  * 
  * Erick Daniel Corona Garcia. 210224314. TSOA03.
  */
 
 package sistemaDistribuido.sistema.rpc.modoUsuario;
 
-// import sistemaDistribuido.sistema.rpc.modoMonitor.RPC;  //para practica 4
+import sistemaDistribuido.sistema.rpc.modoMonitor.RPC;
 import java.util.Arrays;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
@@ -14,7 +14,6 @@ import sistemaDistribuido.util.Escribano;
 import sistemaDistribuido.util.IntByteConverter;
 
 public class LibreriaCliente extends Libreria {
-    private static final int DESTINATION_DEFAULT = 248;
     private byte[] m_requestBuffer = new byte[SIZE_PACKET];
     private byte[] m_responseBuffer = new byte[SIZE_PACKET];
 
@@ -26,9 +25,8 @@ public class LibreriaCliente extends Libreria {
         packParameters();
         m_requestBuffer[INDEX_OPCODE] = OPCODE_SUMMATION;
 
-        // TODO: para practica 4
-        // asaDest=RPC.importarInterfaz(nombreServidor, version)
-        Nucleo.send(DESTINATION_DEFAULT, m_requestBuffer);
+        int destinationHandle = RPC.importarInterfaz("CandyServer", "1.1");
+        Nucleo.send(destinationHandle, m_requestBuffer);
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
@@ -37,7 +35,9 @@ public class LibreriaCliente extends Libreria {
     public void max() {
         packParameters();
         m_requestBuffer[INDEX_OPCODE] = OPCODE_MAX;
-        Nucleo.send(DESTINATION_DEFAULT, m_requestBuffer);
+
+        int destinationHandle = RPC.importarInterfaz("CandyServer", "1.1");
+        Nucleo.send(destinationHandle, m_requestBuffer);
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
@@ -46,7 +46,9 @@ public class LibreriaCliente extends Libreria {
     public void min() {
         packParameters();
         m_requestBuffer[INDEX_OPCODE] = OPCODE_MIN;
-        Nucleo.send(DESTINATION_DEFAULT, m_requestBuffer);
+
+        int destinationHandle = RPC.importarInterfaz("CandyServer", "1.1");
+        Nucleo.send(destinationHandle, m_requestBuffer);
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));
@@ -55,7 +57,9 @@ public class LibreriaCliente extends Libreria {
     public void cube() {
         packParameters();
         m_requestBuffer[INDEX_OPCODE] = OPCODE_CUBE;
-        Nucleo.send(DESTINATION_DEFAULT, m_requestBuffer);
+
+        int destinationHandle = RPC.importarInterfaz("CandyServer", "1.1");
+        Nucleo.send(destinationHandle, m_requestBuffer);
 
         Nucleo.receive(Nucleo.dameIdProceso(), m_responseBuffer);
         m_parametersStack.push(Integer.valueOf(unpackResponse()));

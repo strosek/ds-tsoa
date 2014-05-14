@@ -22,8 +22,15 @@ public class RPC {
      * llamada a send(dest,message).
      */
     public static int importarInterfaz(String name, String version) {
-        // asa=conector.busqueda()
-        return 0;
+        ParMaquinaProceso handle = m_connector.busqueda(name, version);
+
+        if (handle == null) {
+            return -1;
+        }
+
+        Nucleo.nucleo.registrarParMaquinaProceso(handle);
+
+        return handle.dameID();
     }
 
     /**
@@ -43,13 +50,14 @@ public class RPC {
                                               int uniqueId) {
         boolean isServerRemoved = m_connector.deregistro(name, version,
                                                          uniqueId);
-        // TODO define a place to put this code.
-//        if (isServerRemoved) {
-//            Nucleo.imprimenl("Exito removiendo el servidor: " + uniqueId);
-//        }
-//        else {
-//            Nucleo.imprimenl("Error removiendo el servidor: " + uniqueId);
-//        }
+        if (isServerRemoved) {
+            Nucleo.nucleo.imprimeln("Exito removiendo el servidor: " +
+                                    uniqueId);
+        }
+        else {
+            Nucleo.nucleo.imprimeln("Error removiendo el servidor: " +
+                                    uniqueId);
+        }
         return isServerRemoved;
     }
 }

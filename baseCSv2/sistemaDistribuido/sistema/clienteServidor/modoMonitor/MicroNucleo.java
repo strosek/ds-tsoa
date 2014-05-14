@@ -1,7 +1,7 @@
 /*
  * Erick Daniel Corona Garcia 210224314. TSOA D03.
  * 
- * Modificado para Practica 2.
+ * Modificado para Practica 4.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
@@ -21,11 +21,11 @@ import sistemaDistribuido.util.IntByteConverter;
 
 public final class MicroNucleo extends MicroNucleoBase {
     private static MicroNucleo nucleo = new MicroNucleo();
-    private Hashtable<Integer, MachineProcessPair> m_emissionTable;
+    private Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
     private Hashtable<Integer, byte[]> m_receptionTable;
 
     private MicroNucleo() {
-        m_emissionTable = new Hashtable<Integer, MachineProcessPair>();
+        m_emissionTable = new Hashtable<Integer, ParMaquinaProceso>();
         m_receptionTable = new Hashtable<Integer, byte[]>();
     }
 
@@ -187,5 +187,9 @@ public final class MicroNucleo extends MicroNucleoBase {
                         + e.getMessage());
             }
         }
+    }
+    
+    public void registrarParMaquinaProceso(ParMaquinaProceso server) {
+        m_emissionTable.put(server.dameID(), server);
     }
 }
