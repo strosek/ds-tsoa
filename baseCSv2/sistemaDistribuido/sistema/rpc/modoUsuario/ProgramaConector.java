@@ -11,8 +11,10 @@ import sistemaDistribuido.visual.rpc.DespleganteConexiones;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.Vector;
 
 public class ProgramaConector {
     private DespleganteConexiones m_display;
@@ -80,18 +82,21 @@ public class ProgramaConector {
 
     public ParMaquinaProceso busqueda(String name, String version) {
         ParMaquinaProceso result = null;
+        Vector<ParMaquinaProceso> results = new Vector<ParMaquinaProceso>();
 
-        boolean isServerFound = false;
         ServerData server;
         Enumeration<ServerData> servers = m_connections.elements();
-        while (servers.hasMoreElements() && !isServerFound) {
+        while (servers.hasMoreElements()) {
             server = servers.nextElement();
             if (server.getName().equals(name) &&
                 server.getVersion().equals(version)) {
-                result = server.getHandle();
-                isServerFound = true;
+                results.add(server.getHandle());
             }
         }
+
+        Random random = new Random();
+        int vectorIndex = random.nextInt() % results.size();
+        result = results.get(vectorIndex);
 
         return result;
     }

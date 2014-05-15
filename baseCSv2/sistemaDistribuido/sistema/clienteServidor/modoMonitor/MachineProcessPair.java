@@ -8,9 +8,11 @@ package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
 public class MachineProcessPair implements ParMaquinaProceso {
     private String m_ip;
-    private int m_id;
+    private int    m_id;
 
     public MachineProcessPair() {
+        m_ip = "127.0.0.1";
+        m_id = 666;
     }
 
     public MachineProcessPair(String ip, int id) {

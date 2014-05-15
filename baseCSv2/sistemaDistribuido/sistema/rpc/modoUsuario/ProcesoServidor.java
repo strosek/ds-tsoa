@@ -31,8 +31,13 @@ public class ProcesoServidor extends Proceso {
     public void run() {
         imprimeln("Proceso servidor en ejecucion.");
 
-        // TODO: get a real handle
-        ParMaquinaProceso handle = new MachineProcessPair();
+        ParMaquinaProceso handle = null;
+        handle = new MachineProcessPair(
+                // FIXME: get dynamic address, remove hard-coded value.
+                //InetAddress.getLocalHost().getHostAddress(),
+                "127.0.0.1",
+                Nucleo.dameIdProceso());
+
         String serverName = "CandyServer";
         String serverVersion = "1.1";
         int uniqueId = RPC.exportarInterfaz(serverName, serverVersion, handle);
