@@ -81,7 +81,6 @@ public class ProgramaConector {
     }
 
     public ParMaquinaProceso busqueda(String name, String version) {
-        ParMaquinaProceso result = null;
         Vector<ParMaquinaProceso> results = new Vector<ParMaquinaProceso>();
 
         ServerData server;
@@ -94,8 +93,20 @@ public class ProgramaConector {
             }
         }
 
-        Random random = new Random();
-        int vectorIndex = random.nextInt() % results.size();
+        ParMaquinaProceso result = null;
+        int vectorIndex = 0;
+
+        if (results.size() > 1) {
+            Random random = new Random();
+            vectorIndex = random.nextInt() % results.size();
+            if (vectorIndex < 0) {
+                vectorIndex = -vectorIndex;
+            }
+
+            System.out.println("size: " + results.size());
+            System.out.println("index: " + vectorIndex);
+        }
+
         result = results.get(vectorIndex);
 
         return result;
