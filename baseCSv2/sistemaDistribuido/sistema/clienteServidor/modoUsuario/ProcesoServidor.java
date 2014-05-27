@@ -1,7 +1,7 @@
 /*
  * Erick Daniel Corona Garcia 210224314. TSOA D03.
  * 
- * Modificado para Practica 2.
+ * Modificado para Practica 5.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;
@@ -22,7 +22,7 @@ import sistemaDistribuido.util.Pausador;
 import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
 public class ProcesoServidor extends Proceso {
-    public static final int INDEX_STATUS = 8;
+    public static final int INDEX_STATUS = 1023;
     public static final int INDEX_MESSLENGTH = 9;
     public static final int INDEX_MESSAGE = 10;
 
@@ -35,6 +35,7 @@ public class ProcesoServidor extends Proceso {
     public static final int STATUS_ERR_CREATE = 6;
     public static final int STATUS_ERR_DELETE = 7;
     public static final int STATUS_AU = 8;
+    public static final int STATUS_TA = 9;
 
     public static final int SIZE_PACKET = 1024;
 
@@ -55,6 +56,9 @@ public class ProcesoServidor extends Proceso {
 
         String fileName;
         String argument;
+
+        Nucleo.nucleo.addNewMailbox(dameID());
+
         while (continuar()) {
             imprimeln("Invocando a receive...");
             Nucleo.receive(dameID(), m_request);

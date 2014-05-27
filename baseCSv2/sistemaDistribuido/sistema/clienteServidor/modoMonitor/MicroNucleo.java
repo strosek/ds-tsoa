@@ -1,7 +1,7 @@
 /*
  * Erick Daniel Corona Garcia 210224314. TSOA D03.
  * 
- * Modificado para Practica 4.
+ * Modificado para Practica 5.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
@@ -18,15 +18,18 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
 import sistemaDistribuido.util.IntByteConverter;
+import sistemaDistribuido.util.Pausador;
 
 public final class MicroNucleo extends MicroNucleoBase {
     private static MicroNucleo nucleo = new MicroNucleo();
     private Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
-    private Hashtable<Integer, byte[]> m_receptionTable;
+    private Hashtable<Integer, byte[]>            m_receptionTable;
+    private Hashtable<Integer, RequestsMailbox>   m_mailboxesTable;
 
     private MicroNucleo() {
         m_emissionTable = new Hashtable<Integer, ParMaquinaProceso>();
         m_receptionTable = new Hashtable<Integer, byte[]>();
+        m_mailboxesTable = new Hashtable<Integer, RequestsMailbox>();
     }
 
     public final static MicroNucleo obtenerMicroNucleo() {
@@ -102,11 +105,28 @@ public final class MicroNucleo extends MicroNucleoBase {
     }
 
     protected void receiveVerdadero(int addr, byte[] message) {
-        m_receptionTable.put(new Integer(addr), message);
         imprimeln("Recibido mensaje proviniente de la red");
         imprimeln("Recibido mensaje que contiene la ubicacion: " + addr);
-        suspenderProceso();
+
+        RequestsMailbox mailbox = getRequestsMailbox(dameIdProceso());
+        if (mailbox != null) { // Process is a server.
+            if (mailbox.isEmpty()) {
+                m_receptionTable.put(Integer.valueOf(addr), message);
+                suspenderProceso();
+            }
+            else {
+                byte[] mailboxMessage = mailbox.getOldestMessage();
+                System.arraycopy(mailboxMessage, 0, message, 0, 
+                        mailboxMessage.length);
+            }
+        }
+        else { // Process is a client.
+            imprimeln("Registrando proceso cliente");
+            m_receptionTable.put(Integer.valueOf(addr), message);
+            suspenderProceso();
+        }
     }
+
 
     /**
      * Para el(la) encargad@ de direccionamiento por servidor de nombres en
@@ -116,13 +136,13 @@ public final class MicroNucleo extends MicroNucleoBase {
     }
 
     /**
-     * Para el(la) encargad@ de primitivas sin bloqueo en pr�ctica 5
+     * Para el(la) encargad@ de primitivas sin bloqueo en practica 5
      */
     protected void sendNBVerdadero(int dest, byte[] message) {
     }
 
     /**
-     * Para el(la) encargad@ de primitivas sin bloqueo en pr�ctica 5
+     * Para el(la) encargad@ de primitivas sin bloqueo en practica 5
      */
     protected void receiveNBVerdadero(int addr, byte[] message) {
     }
@@ -150,6 +170,16 @@ public final class MicroNucleo extends MicroNucleoBase {
                         ProcesoCliente.INDEX_DESTINATION
                                 + IntByteConverter.SIZE_INT));
 
+                if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
+                    ProcesoServidor.STATUS_AU) {
+                    // TODO: notify client and wake it up.
+                }
+                else if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
+                         ProcesoServidor.STATUS_TA) {
+                    // TODO: save message in retransmissions table
+                    Pausador.pausa(5000);
+                }
+
                 imprimeln("Buscando proceso correspondiente al campo recibido");
                 process = nucleo.dameProcesoLocal(destination);
                 if (process != null) {
@@ -164,32 +194,82 @@ public final class MicroNucleo extends MicroNucleoBase {
                         m_receptionTable.remove(destination);
                         nucleo.reanudarProceso(process);
                     }
+                    else {
+                        if (m_mailboxesTable.containsKey(
+                            nucleo.dameIdProceso(process))) {
+                            RequestsMailbox mailbox = m_mailboxesTable.get(
+                                    nucleo.dameIdProceso(process));
+                            if (mailbox.hasSpace()) {
+                                mailbox.saveMessage(packet.getData());
+                            }
+                            else {
+                                imprimeln("Proceso distinatario ocupado");
+                                buffer[ProcesoServidor.INDEX_STATUS] = 
+                                        (byte)ProcesoServidor.STATUS_TA;
+
+                                byte[] originBytes =
+                                        IntByteConverter.toBytes(origin);
+                                byte[] destinationBytes =
+                                        IntByteConverter.toBytes(
+                                        destination);
+                                for (int i = 0; i < IntByteConverter.SIZE_INT;
+                                     ++i) {
+                                    buffer[ProcesoCliente.INDEX_ORIGIN + i] =
+                                            destinationBytes[i];
+                                    buffer[ProcesoCliente.INDEX_DESTINATION +
+                                           i] = originBytes[i];
+                                }
+                                packet = new DatagramPacket(buffer,
+                                        buffer.length,
+                                        InetAddress.getByName(originIp),
+                                        nucleo.damePuertoRecepcion());
+                                nucleo.dameSocketEmision().send(packet);
+                            }
+                        }
+                    }
                 }
                 else {
-                    imprimeln("Proceso distinatario no encontrado segun el "
-                            + "campo dest recibido");
-                    buffer[ProcesoServidor.INDEX_STATUS] = 
+                    imprimeln("Proceso distinatario no encontrado segun el " +
+                              "campo dest recibido");
+                    buffer[ProcesoServidor.INDEX_STATUS] =
                             (byte)ProcesoServidor.STATUS_AU;
 
                     byte[] originBytes = IntByteConverter.toBytes(origin);
-                    byte[] destinationBytes = IntByteConverter.toBytes(destination);
+                    byte[] destinationBytes = IntByteConverter.toBytes(
+                            destination);
                     for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
-                        buffer[ProcesoCliente.INDEX_ORIGIN + i] = destinationBytes[i];
-                        buffer[ProcesoCliente.INDEX_DESTINATION + i] = originBytes[i];
+                        buffer[ProcesoCliente.INDEX_ORIGIN + i] =
+                                destinationBytes[i];
+                        buffer[ProcesoCliente.INDEX_DESTINATION + i] =
+                                originBytes[i];
                     }
                     packet = new DatagramPacket(buffer, buffer.length,
                             InetAddress.getByName(originIp),
                             nucleo.damePuertoRecepcion());
                     nucleo.dameSocketEmision().send(packet);
                 }
-            } catch (IOException e) {
-                System.err.println("Error en la recepcion del paquete: "
-                        + e.getMessage());
+            } catch (IOException ioe) {
+                System.err.println("Error en la recepcion del paquete: " +
+                                   ioe.getMessage());
             }
         }
     }
-    
+
     public void registrarParMaquinaProceso(ParMaquinaProceso server) {
         m_emissionTable.put(server.dameID(), server);
+    }
+
+    private RequestsMailbox getRequestsMailbox(int pid) {
+        RequestsMailbox mailbox = null;
+
+        if (m_mailboxesTable.containsKey(Integer.valueOf(pid))) {
+            mailbox = m_mailboxesTable.get(Integer.valueOf(pid));
+        }
+
+        return mailbox;
+    }
+
+    public void addNewMailbox(int pid) {
+        m_mailboxesTable.put(Integer.valueOf(pid), new RequestsMailbox());
     }
 }
