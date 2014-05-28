@@ -89,6 +89,9 @@ public final class MicroNucleo extends MicroNucleoBase {
             message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
             message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
         }
+        
+        System.out.println("before sending answer: ");
+        printBuffer(message);
 
         try {
             DatagramPacket packet = new DatagramPacket(message, message.length,
@@ -121,6 +124,7 @@ public final class MicroNucleo extends MicroNucleoBase {
                 byte[] mailboxMessage = mailbox.getOldestMessage();
                 System.arraycopy(mailboxMessage, 0, message, 0, 
                         mailboxMessage.length);
+                m_receptionTable.put(Integer.valueOf(addr), message);
             }
         }
         else { // Process is a client.
@@ -169,7 +173,7 @@ public final class MicroNucleo extends MicroNucleoBase {
 
                 destination = IntByteConverter.toInt(Arrays.copyOfRange(
                         packet.getData(), ProcesoCliente.INDEX_DESTINATION,
-                        ProcesoCliente.INDEX_DESTINATION + 
+                        ProcesoCliente.INDEX_DESTINATION +
                         IntByteConverter.SIZE_INT));
 
                 if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
@@ -204,6 +208,8 @@ public final class MicroNucleo extends MicroNucleoBase {
                                     nucleo.dameIdProceso(process));
                             if (mailbox.hasSpace()) {
                                 imprimeln("Guardando mensaje en buzon.");
+                                System.out.println("message before saving in mailbox");
+                                printBuffer(packet.getData());
                                 mailbox.saveMessage(packet.getData());
                             }
                             else {
@@ -225,10 +231,13 @@ public final class MicroNucleo extends MicroNucleoBase {
                                     buffer[ProcesoCliente.INDEX_DESTINATION +
                                            i] = originBytes[i];
                                 }
+
                                 packet = new DatagramPacket(buffer,
                                         buffer.length,
                                         InetAddress.getByName(originIp),
                                         nucleo.damePuertoRecepcion());
+                                System.out.println("buffer before sending TA");
+                                printBuffer(packet.getData());
                                 nucleo.dameSocketEmision().send(packet);
                             }
                         }
@@ -277,5 +286,24 @@ public final class MicroNucleo extends MicroNucleoBase {
 
     public void addNewMailbox(int pid) {
         m_mailboxesTable.put(Integer.valueOf(pid), new RequestsMailbox());
+    }
+    
+    public void invertOriginDestinationBytes(byte[] buffer) {
+        
+    }
+    
+    public void setOriginBytes(byte[] buffer, int origin) {
+        
+    }
+
+    public void setDestinationBytes(byte[] buffer, int origin) {
+        
+    }
+    
+    public static void printBuffer(byte[] buffer) {
+        for (int i = 0; i < 20; ++i) {
+            System.out.print(buffer[i] + ", ");
+        }
+        System.out.println();
     }
 }

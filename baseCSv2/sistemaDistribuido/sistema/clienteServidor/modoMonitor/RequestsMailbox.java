@@ -32,6 +32,7 @@ public class RequestsMailbox {
         System.out.println("sacando primer mensaje de buzon");
         byte[] firstMessage = m_container.removeFirst();
         System.out.println("mailbox size: " + m_container.size());
+        MicroNucleo.printBuffer(firstMessage);
         return firstMessage;
     }
 
