@@ -12,12 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
-import sistemaDistribuido.util.IntByteConverter;
 import sistemaDistribuido.util.Pausador;
 import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
@@ -106,20 +103,11 @@ public class ProcesoServidor extends Proceso {
             // avoid server's send() before client's receive()
             Pausador.pausa(2000);
 
-            int origin = IntByteConverter.toInt(Arrays.copyOfRange(m_request,
-                    ProcesoCliente.INDEX_ORIGIN, ProcesoCliente.INDEX_ORIGIN
-                            + IntByteConverter.SIZE_INT));
-            int destination = IntByteConverter.toInt(Arrays.copyOfRange(
-                    m_request, ProcesoCliente.INDEX_DESTINATION,
-                    ProcesoCliente.INDEX_DESTINATION
-                            + IntByteConverter.SIZE_INT));
+            int origin = Nucleo.nucleo.getOrigin(m_request);
+            int destination = Nucleo.nucleo.getDestination(m_request);
 
-            byte[] originBytes = IntByteConverter.toBytes(origin);
-            byte[] destinationBytes = IntByteConverter.toBytes(destination);
-            for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
-                m_response[ProcesoCliente.INDEX_ORIGIN + i] = destinationBytes[i];
-                m_response[ProcesoCliente.INDEX_DESTINATION + i] = originBytes[i];
-            }
+            Nucleo.nucleo.setOriginBytes(m_request, destination);
+            Nucleo.nucleo.setDestinationBytes(m_request, origin);
 
             Nucleo.send(origin, m_response);
         }

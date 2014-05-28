@@ -211,8 +211,8 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 
-                                setOriginBytes(buffer, destination);
-                                setDestinationBytes(buffer, origin);
+//                                setOriginBytes(buffer, destination);
+//                                setDestinationBytes(buffer, origin);
 
                                 packet = new DatagramPacket(buffer,
                                         buffer.length,
