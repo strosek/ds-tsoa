@@ -81,15 +81,10 @@ public final class MicroNucleo extends MicroNucleoBase {
         imprimeln("Buscando en listas locales el par (" + ip + ", " + dest
                 + ")");
 
-        byte[] originBytes = IntByteConverter.toBytes(super.dameIdProceso());
-        byte[] destinationBytes = IntByteConverter.toBytes(id);
-
         imprime("Completando campos del encabezado del mensaje a ser enviado");
-        for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
-            message[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
-            message[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
-        }
-        
+        setOriginBytes(message, super.dameIdProceso());
+        setDestinationBytes(message, id);
+
         System.out.println("before sending answer: ");
         printBuffer(message);
 
@@ -136,7 +131,7 @@ public final class MicroNucleo extends MicroNucleoBase {
 
     /**
      * Para el(la) encargad@ de direccionamiento por servidor de nombres en
-     * pr�ctica 5
+     * practica 5
      */
     protected void sendVerdadero(String dest, byte[] message) {
     }
@@ -164,21 +159,18 @@ public final class MicroNucleo extends MicroNucleoBase {
             try {
                 nucleo.dameSocketRecepcion().receive(packet);
 
-                origin = IntByteConverter
-                        .toInt(Arrays.copyOfRange(packet.getData(),
-                                ProcesoCliente.INDEX_ORIGIN,
-                                ProcesoCliente.INDEX_ORIGIN
-                                        + IntByteConverter.SIZE_INT));
+                origin = getOrigin(packet.getData());
                 originIp = packet.getAddress().getHostAddress();
-
-                destination = IntByteConverter.toInt(Arrays.copyOfRange(
-                        packet.getData(), ProcesoCliente.INDEX_DESTINATION,
-                        ProcesoCliente.INDEX_DESTINATION +
-                        IntByteConverter.SIZE_INT));
+                destination = getDestination(packet.getData());
+                
+                System.out.println("buffer to extract origin, dest: ");
+                printBuffer(packet.getData());
+                System.out.println("origin: " + origin + " dest: " + destination);
 
                 if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
                     ProcesoServidor.STATUS_TA) {
                     packet.getData()[ProcesoServidor.INDEX_STATUS] = 0;
+
                     System.out.println("data to resend: " + packet.getData());
                     ResendThread resender = new ResendThread(
                             dameSocketRecepcion(), packet);
@@ -219,18 +211,8 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 
-                                byte[] originBytes =
-                                        IntByteConverter.toBytes(origin);
-                                byte[] destinationBytes =
-                                        IntByteConverter.toBytes(
-                                        destination);
-                                for (int i = 0; i < IntByteConverter.SIZE_INT;
-                                     ++i) {
-                                    buffer[ProcesoCliente.INDEX_ORIGIN + i] =
-                                            destinationBytes[i];
-                                    buffer[ProcesoCliente.INDEX_DESTINATION +
-                                           i] = originBytes[i];
-                                }
+                                setOriginBytes(buffer, destination);
+                                setDestinationBytes(buffer, origin);
 
                                 packet = new DatagramPacket(buffer,
                                         buffer.length,
@@ -249,15 +231,9 @@ public final class MicroNucleo extends MicroNucleoBase {
                     buffer[ProcesoServidor.INDEX_STATUS] =
                             (byte)ProcesoServidor.STATUS_AU;
 
-                    byte[] originBytes = IntByteConverter.toBytes(origin);
-                    byte[] destinationBytes = IntByteConverter.toBytes(
-                            destination);
-                    for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
-                        buffer[ProcesoCliente.INDEX_ORIGIN + i] =
-                                destinationBytes[i];
-                        buffer[ProcesoCliente.INDEX_DESTINATION + i] =
-                                originBytes[i];
-                    }
+                    setOriginBytes(buffer, destination);
+                    setDestinationBytes(buffer, origin);
+
                     packet = new DatagramPacket(buffer, buffer.length,
                             InetAddress.getByName(originIp),
                             nucleo.damePuertoRecepcion());
@@ -287,22 +263,50 @@ public final class MicroNucleo extends MicroNucleoBase {
     public void addNewMailbox(int pid) {
         m_mailboxesTable.put(Integer.valueOf(pid), new RequestsMailbox());
     }
-    
-    public void invertOriginDestinationBytes(byte[] buffer) {
-        
-    }
-    
+
     public void setOriginBytes(byte[] buffer, int origin) {
-        
+        byte[] originBytes = IntByteConverter.toBytes(origin);
+
+        for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+            buffer[ProcesoCliente.INDEX_ORIGIN + i] = originBytes[i];
+        }
     }
 
-    public void setDestinationBytes(byte[] buffer, int origin) {
-        
+    public void setDestinationBytes(byte[] buffer, int destination) {
+        byte[] destinationBytes = IntByteConverter.toBytes(destination);
+
+        for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+            buffer[ProcesoCliente.INDEX_DESTINATION + i] = destinationBytes[i];
+        }
     }
-    
+
+    public int getOrigin(byte[] buffer) {
+        return IntByteConverter.toInt(Arrays.copyOfRange(buffer,
+                ProcesoCliente.INDEX_ORIGIN,
+                ProcesoCliente.INDEX_ORIGIN +
+                IntByteConverter.SIZE_INT));
+    }
+
+    public int getDestination(byte[] buffer) {
+        return IntByteConverter.toInt(Arrays.copyOfRange(buffer,
+                ProcesoCliente.INDEX_DESTINATION,
+                ProcesoCliente.INDEX_DESTINATION +
+                IntByteConverter.SIZE_INT));
+    }
+
+    public void invertOriginDestination(byte[] buffer) {
+        byte aux;
+        for (int i = 0; i < IntByteConverter.SIZE_INT; ++i) {
+            aux = buffer[ProcesoCliente.INDEX_ORIGIN + i];
+            buffer[ProcesoCliente.INDEX_ORIGIN + i] =
+                    buffer[ProcesoCliente.INDEX_DESTINATION + i];
+            buffer[ProcesoCliente.INDEX_DESTINATION + i] = aux;
+        }
+    }
+
     public static void printBuffer(byte[] buffer) {
         for (int i = 0; i < 20; ++i) {
-            System.out.print(buffer[i] + ", ");
+            System.out.print(buffer[i] + "|");
         }
         System.out.println();
     }
