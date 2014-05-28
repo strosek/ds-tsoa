@@ -19,6 +19,7 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ResendThread;
 import sistemaDistribuido.util.IntByteConverter;
+import sistemaDistribuido.util.Pausador;
 
 public final class MicroNucleo extends MicroNucleoBase {
     private static MicroNucleo nucleo = new MicroNucleo();
@@ -89,6 +90,8 @@ public final class MicroNucleo extends MicroNucleoBase {
         printBuffer(message);
 
         try {
+            //System.out.println("Destino: "+destination);
+            System.out.println("Origen: "+id);
             DatagramPacket packet = new DatagramPacket(message, message.length,
                     InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
             imprime("Enviando mensaje por la red");
@@ -100,6 +103,8 @@ public final class MicroNucleo extends MicroNucleoBase {
             System.err.println("Error creando socket transmision: "
                     + e.getMessage());
         }
+        
+        Pausador.pausa(2000);
     }
 
     protected void receiveVerdadero(int addr, byte[] message) {
@@ -117,6 +122,7 @@ public final class MicroNucleo extends MicroNucleoBase {
             else {
                 imprimeln("Sacando mensaje del buzon");
                 byte[] mailboxMessage = mailbox.getOldestMessage();
+                invertOriginDestination(mailboxMessage);
                 System.arraycopy(mailboxMessage, 0, message, 0, 
                         mailboxMessage.length);
                 m_receptionTable.put(Integer.valueOf(addr), message);
@@ -181,6 +187,7 @@ public final class MicroNucleo extends MicroNucleoBase {
 
                 imprimeln("Buscando proceso correspondiente al campo recibido");
                 process = nucleo.dameProcesoLocal(destination);
+                
                 if (process != null) {
                     if (m_receptionTable.containsKey(destination)) {
                         byte[] array = m_receptionTable.get(destination);
