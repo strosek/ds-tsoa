@@ -1,7 +1,7 @@
 /*
  * Erick Daniel Corona Garcia 210224314. TSOA D03.
  * 
- * Modificado para Practica 2.
+ * Modificado para Practica 5.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;
@@ -91,6 +91,9 @@ public class ProcesoCliente extends Proceso {
             break;
         case ProcesoServidor.STATUS_AU:
             imprimeln("Error al enviar peticion: direccion desconocida.");
+            break;
+        case ProcesoServidor.STATUS_TA:
+            imprimeln("Error al enviar peticion: servidor ocupado");
             break;
         default:
             imprimeln("invalid status");

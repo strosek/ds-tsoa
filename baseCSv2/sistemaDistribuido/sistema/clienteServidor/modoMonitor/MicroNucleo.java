@@ -17,8 +17,8 @@ import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ResendThread;
 import sistemaDistribuido.util.IntByteConverter;
-import sistemaDistribuido.util.Pausador;
 
 public final class MicroNucleo extends MicroNucleoBase {
     private static MicroNucleo nucleo = new MicroNucleo();
@@ -110,11 +110,14 @@ public final class MicroNucleo extends MicroNucleoBase {
 
         RequestsMailbox mailbox = getRequestsMailbox(dameIdProceso());
         if (mailbox != null) { // Process is a server.
+            imprimeln("Procesando receive de servidor");
             if (mailbox.isEmpty()) {
+                imprimeln("Buzon vacio");
                 m_receptionTable.put(Integer.valueOf(addr), message);
                 suspenderProceso();
             }
             else {
+                imprimeln("Sacando mensaje del buzon");
                 byte[] mailboxMessage = mailbox.getOldestMessage();
                 System.arraycopy(mailboxMessage, 0, message, 0, 
                         mailboxMessage.length);
@@ -126,7 +129,6 @@ public final class MicroNucleo extends MicroNucleoBase {
             suspenderProceso();
         }
     }
-
 
     /**
      * Para el(la) encargad@ de direccionamiento por servidor de nombres en
@@ -167,17 +169,16 @@ public final class MicroNucleo extends MicroNucleoBase {
 
                 destination = IntByteConverter.toInt(Arrays.copyOfRange(
                         packet.getData(), ProcesoCliente.INDEX_DESTINATION,
-                        ProcesoCliente.INDEX_DESTINATION
-                                + IntByteConverter.SIZE_INT));
+                        ProcesoCliente.INDEX_DESTINATION + 
+                        IntByteConverter.SIZE_INT));
 
                 if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
-                    ProcesoServidor.STATUS_AU) {
-                    // TODO: notify client and wake it up.
-                }
-                else if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
-                         ProcesoServidor.STATUS_TA) {
-                    // TODO: save message in retransmissions table
-                    Pausador.pausa(5000);
+                    ProcesoServidor.STATUS_TA) {
+                    ResendThread resender = new ResendThread(
+                            nucleo.dameSocketRecepcion(),
+                            nucleo.damePuertoRecepcion(),
+                            packet.getData());
+                    resender.start();
                 }
 
                 imprimeln("Buscando proceso correspondiente al campo recibido");
@@ -200,10 +201,13 @@ public final class MicroNucleo extends MicroNucleoBase {
                             RequestsMailbox mailbox = m_mailboxesTable.get(
                                     nucleo.dameIdProceso(process));
                             if (mailbox.hasSpace()) {
+                                imprimeln("Guardando mensaje en buzon.");
                                 mailbox.saveMessage(packet.getData());
                             }
                             else {
-                                imprimeln("Proceso distinatario ocupado");
+                                System.out.println("buzon lleno, enviando TA");
+                                imprimeln("Proceso distinatario ocupado, " + 
+                                          "enviando TA");
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 

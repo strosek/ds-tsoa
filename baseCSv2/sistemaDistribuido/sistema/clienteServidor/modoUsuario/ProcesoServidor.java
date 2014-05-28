@@ -57,6 +57,7 @@ public class ProcesoServidor extends Proceso {
         String fileName;
         String argument;
 
+        imprimeln("Agregando buzon");
         Nucleo.nucleo.addNewMailbox(dameID());
 
         while (continuar()) {
@@ -64,6 +65,8 @@ public class ProcesoServidor extends Proceso {
             Nucleo.receive(dameID(), m_request);
 
             imprimeln("Procesando peticion recibida del cliente...");
+            Pausador.pausa(5000);
+
             m_requestMessage = new String(m_request,
                     ProcesoCliente.INDEX_MESSAGE,
                     (int) m_request[ProcesoCliente.INDEX_MESSAGELENGTH]);

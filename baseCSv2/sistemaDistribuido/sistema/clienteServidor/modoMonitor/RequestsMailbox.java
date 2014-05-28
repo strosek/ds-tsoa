@@ -24,6 +24,7 @@ public class RequestsMailbox {
 
         System.arraycopy(message, 0, localMessage, 0, message.length);
         m_container.offer(localMessage);
+        System.out.println("mailbox size: " + m_container.size());
     }
 
     public byte[] getOldestMessage() {
