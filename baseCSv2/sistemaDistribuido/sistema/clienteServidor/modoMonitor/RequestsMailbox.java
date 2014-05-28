@@ -23,12 +23,16 @@ public class RequestsMailbox {
         byte[] localMessage = new byte[message.length];
 
         System.arraycopy(message, 0, localMessage, 0, message.length);
-        m_container.offer(localMessage);
+        System.out.println("insertando mensaje en buzon");
+        m_container.addLast(localMessage);
         System.out.println("mailbox size: " + m_container.size());
     }
 
     public byte[] getOldestMessage() {
-        return m_container.poll();
+        System.out.println("sacando primer mensaje de buzon");
+        byte[] firstMessage = m_container.removeFirst();
+        System.out.println("mailbox size: " + m_container.size());
+        return firstMessage;
     }
 
     public boolean hasSpace() {

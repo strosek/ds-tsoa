@@ -108,7 +108,7 @@ public final class MicroNucleo extends MicroNucleoBase {
         imprimeln("Recibido mensaje proviniente de la red");
         imprimeln("Recibido mensaje que contiene la ubicacion: " + addr);
 
-        RequestsMailbox mailbox = getRequestsMailbox(dameIdProceso());
+        RequestsMailbox mailbox = getRequestsMailbox(super.dameIdProceso());
         if (mailbox != null) { // Process is a server.
             imprimeln("Procesando receive de servidor");
             if (mailbox.isEmpty()) {
@@ -174,11 +174,13 @@ public final class MicroNucleo extends MicroNucleoBase {
 
                 if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
                     ProcesoServidor.STATUS_TA) {
+                    packet.getData()[ProcesoServidor.INDEX_STATUS] = 0;
+                    System.out.println("data to resend: " + packet.getData());
                     ResendThread resender = new ResendThread(
-                            nucleo.dameSocketRecepcion(),
-                            nucleo.damePuertoRecepcion(),
-                            packet.getData());
+                            dameSocketRecepcion(), packet);
+                    System.out.println("resender: start");
                     resender.start();
+                    System.out.println("resender: background?");
                 }
 
                 imprimeln("Buscando proceso correspondiente al campo recibido");

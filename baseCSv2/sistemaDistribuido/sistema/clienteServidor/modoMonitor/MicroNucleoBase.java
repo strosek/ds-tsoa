@@ -160,21 +160,21 @@ public abstract class MicroNucleoBase extends MicroKernelBase {
     /**
      * Pr�ctica 2 - Socket para enviar datagramas
      */
-    protected final DatagramSocket dameSocketEmision() {
+    public final DatagramSocket dameSocketEmision() {
         return super.getSendSocket();
     }
 
     /**
      * Pr�ctica 2 - Socket para recibir datagramas
      */
-    protected final DatagramSocket dameSocketRecepcion() {
+    public final DatagramSocket dameSocketRecepcion() {
         return super.getReceiveSocket();
     }
 
     /**
      * Pr�ctica 2 - Puerto para recibir mensajes
      */
-    protected final int damePuertoRecepcion() {
+    public final int damePuertoRecepcion() {
         return super.getReceivePort();
     }
 

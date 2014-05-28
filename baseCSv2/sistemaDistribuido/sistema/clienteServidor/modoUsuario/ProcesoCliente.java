@@ -40,8 +40,8 @@ public class ProcesoCliente extends Proceso {
     }
 
     public void run() {
-        imprimeln("Proceso cliente en ejecucion, "
-                + "esperando datos para continuar...");
+        imprimeln("Proceso cliente en ejecucion, " +
+                  "esperando datos para continuar...");
         Nucleo.suspenderProceso();
 
         m_request = new byte[SIZE_PACKET];
@@ -50,8 +50,8 @@ public class ProcesoCliente extends Proceso {
         m_request[INDEX_OPCODE] = m_opcode;
         m_request[INDEX_MESSAGELENGTH] = (byte) m_message.length();
 
-        imprimeln("Generando mensaje a ser enviado,"
-                + " llenando los campos necesarios...");
+        imprimeln("Generando mensaje a ser enviado," +
+                  " llenando los campos necesarios...");
         packMessage();
 
         imprimeln("Senhalamiento al nucleo para envio de mensaje...");
