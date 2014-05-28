@@ -211,6 +211,7 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 
+                                // TODO: define if this is necessary.
 //                                setOriginBytes(buffer, destination);
 //                                setDestinationBytes(buffer, origin);
 
@@ -308,6 +309,7 @@ public final class MicroNucleo extends MicroNucleoBase {
         for (int i = 0; i < 20; ++i) {
             System.out.print(buffer[i] + "|");
         }
+        System.out.println("ST: " + buffer[ProcesoServidor.SIZE_PACKET - 1]);
         System.out.println();
     }
 }
