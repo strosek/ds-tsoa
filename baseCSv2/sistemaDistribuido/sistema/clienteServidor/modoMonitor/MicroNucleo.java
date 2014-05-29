@@ -125,7 +125,12 @@ public final class MicroNucleo extends MicroNucleoBase {
                 invertOriginDestination(mailboxMessage);
                 System.arraycopy(mailboxMessage, 0, message, 0, 
                         mailboxMessage.length);
+                System.out.println("Buffers despues de buzon: ");
+                printBuffer(mailboxMessage);
+                printBuffer(message);
+
                 m_receptionTable.put(Integer.valueOf(addr), message);
+                System.out.println(m_receptionTable.size());
             }
         }
         else { // Process is a client.
