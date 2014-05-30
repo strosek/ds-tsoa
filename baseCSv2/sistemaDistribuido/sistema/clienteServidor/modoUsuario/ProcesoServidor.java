@@ -62,8 +62,6 @@ public class ProcesoServidor extends Proceso {
         while (continuar()) {
             imprimeln("Invocando a receive...");
             Nucleo.receive(dameID(), m_request);
-            System.out.println("datos extraidos del receive verdadero: ");
-            MicroNucleo.printBuffer(m_request);
 
             imprimeln("Procesando peticion recibida del cliente...");
             Pausador.pausa(5000);
@@ -112,9 +110,6 @@ public class ProcesoServidor extends Proceso {
 
             Nucleo.nucleo.setOriginBytes(m_response, destination);
             Nucleo.nucleo.setDestinationBytes(m_response, origin);
-
-            System.out.println("datos resupuesta servidor: ");
-            MicroNucleo.printBuffer(m_response);
 
             Nucleo.send(origin, m_response);
         }

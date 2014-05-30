@@ -65,19 +65,15 @@ public final class MicroNucleo extends MicroNucleoBase {
 
     protected void sendVerdadero(int dest, byte[] message) {
         imprimeln("El proceso invocante es el " + super.dameIdProceso());
-        System.out.println("receiveVerdadero: before setting origin/destination: ");
-        printBuffer(message);
 
         ParMaquinaProceso pmp;
         String ip;
         int id;
 
         if (m_emissionTable.containsKey(new Integer(dest))) {
-            System.out.println("Sacando desde tabla emission..");
             ip = m_emissionTable.get(new Integer(dest)).dameIP();
             id = m_emissionTable.get(new Integer(dest)).dameID();
         } else {
-            System.out.println("Sacando desde interfaz..");
             pmp = dameDestinatarioDesdeInterfaz();
             ip = pmp.dameIP();
             id = pmp.dameID();
@@ -90,18 +86,10 @@ public final class MicroNucleo extends MicroNucleoBase {
         setOriginBytes(message, super.dameIdProceso());
         setDestinationBytes(message, id);
 
-        System.out.println("ip e id: " + ip + " " + id);
-        System.out.println("receiveVerdadero: before sending answer: ");
-        printBuffer(message);
-
         try {
-            //System.out.println("Destino: "+destination);
-            System.out.println("Origen: "+id);
             DatagramPacket packet = new DatagramPacket(message, message.length,
                     InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
             imprime("Enviando mensaje por la red");
-            System.out.println("data in packet: ");
-            printBuffer(message);
             nucleo.dameSocketEmision().send(packet);
         } catch (UnknownHostException e) {
             System.err.println("Error creando socket transmision: "
@@ -129,16 +117,11 @@ public final class MicroNucleo extends MicroNucleoBase {
             else {
                 imprimeln("Sacando mensaje del buzon");
                 byte[] mailboxMessage = mailbox.getOldestMessage();
-                // invertOriginDestination(mailboxMessage);
+
                 System.arraycopy(mailboxMessage, 0, message, 0, 
-                        mailboxMessage.length);
-                System.out.println("Buffers despues de buzon: ");
-                printBuffer(mailboxMessage);
-                printBuffer(message);
+                                 mailboxMessage.length);
 
                 m_receptionTable.put(Integer.valueOf(addr), message);
-                System.out.println("reception table size: " +
-                                   m_receptionTable.size());
             }
         }
         else { // Process is a client.
@@ -181,21 +164,14 @@ public final class MicroNucleo extends MicroNucleoBase {
                 origin = getOrigin(packet.getData());
                 originIp = packet.getAddress().getHostAddress();
                 destination = getDestination(packet.getData());
-                
-                System.out.println("buffer to extract origin, dest: ");
-                printBuffer(packet.getData());
-                System.out.println("origin: " + origin + " dest: " + destination);
 
                 if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
                     ProcesoServidor.STATUS_TA) {
                     packet.getData()[ProcesoServidor.INDEX_STATUS] = 0;
 
-                    System.out.println("data to resend: " + packet.getData());
                     ResendThread resender = new ResendThread(
                             dameSocketRecepcion(), packet);
-                    System.out.println("resender: start");
                     resender.start();
-                    System.out.println("resender: background?");
                 }
 
                 imprimeln("Buscando proceso correspondiente al campo recibido");
@@ -204,10 +180,7 @@ public final class MicroNucleo extends MicroNucleoBase {
                 if (process != null) {
                     if (m_receptionTable.containsKey(destination)) {
                         byte[] array = m_receptionTable.get(destination);
-                        System.out.println("sacado de tabla recepcion:");
-                        printBuffer(m_receptionTable.get(destination));
 
-                        System.out.println("size array: " + array.length);
                         imprimeln("Copiando mensaje al espaco de proceso");
                         System.arraycopy(packet.getData(), 0, array, 0,
                                 array.length);
@@ -224,30 +197,25 @@ public final class MicroNucleo extends MicroNucleoBase {
                                     nucleo.dameIdProceso(process));
                             if (mailbox.hasSpace()) {
                                 imprimeln("Guardando mensaje en buzon.");
-                                System.out.println("message before saving in mailbox");
-                                printBuffer(packet.getData());
                                 mailbox.saveMessage(packet.getData());
                                 m_emissionTable.put(new Integer(origin),
                                         new MachineProcessPair(originIp,
                                         origin));
                             }
                             else {
-                                System.out.println("buzon lleno, enviando TA");
                                 imprimeln("Proceso distinatario ocupado, " + 
                                           "enviando TA");
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 
                                 // TODO: define if this is necessary.
-//                                setOriginBytes(buffer, destination);
-//                                setDestinationBytes(buffer, origin);
+                                setOriginBytes(buffer, destination);
+                                setDestinationBytes(buffer, origin);
 
                                 packet = new DatagramPacket(buffer,
                                         buffer.length,
                                         InetAddress.getByName(originIp),
                                         nucleo.damePuertoRecepcion());
-                                System.out.println("buffer before sending TA");
-                                printBuffer(packet.getData());
                                 nucleo.dameSocketEmision().send(packet);
                             }
                         }
