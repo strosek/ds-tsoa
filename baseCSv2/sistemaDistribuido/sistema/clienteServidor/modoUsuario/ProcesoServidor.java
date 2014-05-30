@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
@@ -60,6 +62,8 @@ public class ProcesoServidor extends Proceso {
         while (continuar()) {
             imprimeln("Invocando a receive...");
             Nucleo.receive(dameID(), m_request);
+            System.out.println("datos extraidos del receive verdadero: ");
+            MicroNucleo.printBuffer(m_request);
 
             imprimeln("Procesando peticion recibida del cliente...");
             Pausador.pausa(5000);
@@ -106,8 +110,11 @@ public class ProcesoServidor extends Proceso {
             int origin = Nucleo.nucleo.getOrigin(m_request);
             int destination = Nucleo.nucleo.getDestination(m_request);
 
-            Nucleo.nucleo.setOriginBytes(m_request, destination);
-            Nucleo.nucleo.setDestinationBytes(m_request, origin);
+            Nucleo.nucleo.setOriginBytes(m_response, destination);
+            Nucleo.nucleo.setDestinationBytes(m_response, origin);
+
+            System.out.println("datos resupuesta servidor: ");
+            MicroNucleo.printBuffer(m_response);
 
             Nucleo.send(origin, m_response);
         }

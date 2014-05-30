@@ -65,28 +65,33 @@ public final class MicroNucleo extends MicroNucleoBase {
 
     protected void sendVerdadero(int dest, byte[] message) {
         imprimeln("El proceso invocante es el " + super.dameIdProceso());
+        System.out.println("receiveVerdadero: before setting origin/destination: ");
+        printBuffer(message);
 
         ParMaquinaProceso pmp;
         String ip;
         int id;
 
         if (m_emissionTable.containsKey(new Integer(dest))) {
+            System.out.println("Sacando desde tabla emission..");
             ip = m_emissionTable.get(new Integer(dest)).dameIP();
             id = m_emissionTable.get(new Integer(dest)).dameID();
         } else {
+            System.out.println("Sacando desde interfaz..");
             pmp = dameDestinatarioDesdeInterfaz();
             ip = pmp.dameIP();
             id = pmp.dameID();
             imprimeln("Enviando mensaje a IP=" + ip + " ID=" + id);
         }
-        imprimeln("Buscando en listas locales el par (" + ip + ", " + dest
-                + ")");
+        imprimeln("Buscando en listas locales el par (" + ip + ", " + dest +
+                  ")");
 
         imprime("Completando campos del encabezado del mensaje a ser enviado");
         setOriginBytes(message, super.dameIdProceso());
         setDestinationBytes(message, id);
 
-        System.out.println("before sending answer: ");
+        System.out.println("ip e id: " + ip + " " + id);
+        System.out.println("receiveVerdadero: before sending answer: ");
         printBuffer(message);
 
         try {
@@ -95,6 +100,8 @@ public final class MicroNucleo extends MicroNucleoBase {
             DatagramPacket packet = new DatagramPacket(message, message.length,
                     InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
             imprime("Enviando mensaje por la red");
+            System.out.println("data in packet: ");
+            printBuffer(message);
             nucleo.dameSocketEmision().send(packet);
         } catch (UnknownHostException e) {
             System.err.println("Error creando socket transmision: "
@@ -122,7 +129,7 @@ public final class MicroNucleo extends MicroNucleoBase {
             else {
                 imprimeln("Sacando mensaje del buzon");
                 byte[] mailboxMessage = mailbox.getOldestMessage();
-                invertOriginDestination(mailboxMessage);
+                // invertOriginDestination(mailboxMessage);
                 System.arraycopy(mailboxMessage, 0, message, 0, 
                         mailboxMessage.length);
                 System.out.println("Buffers despues de buzon: ");
@@ -130,7 +137,8 @@ public final class MicroNucleo extends MicroNucleoBase {
                 printBuffer(message);
 
                 m_receptionTable.put(Integer.valueOf(addr), message);
-                System.out.println(m_receptionTable.size());
+                System.out.println("reception table size: " +
+                                   m_receptionTable.size());
             }
         }
         else { // Process is a client.
@@ -196,12 +204,16 @@ public final class MicroNucleo extends MicroNucleoBase {
                 if (process != null) {
                     if (m_receptionTable.containsKey(destination)) {
                         byte[] array = m_receptionTable.get(destination);
+                        System.out.println("sacado de tabla recepcion:");
+                        printBuffer(m_receptionTable.get(destination));
 
+                        System.out.println("size array: " + array.length);
                         imprimeln("Copiando mensaje al espaco de proceso");
                         System.arraycopy(packet.getData(), 0, array, 0,
                                 array.length);
                         m_emissionTable.put(new Integer(origin),
-                                new MachineProcessPair(originIp, origin));
+                                new MachineProcessPair(originIp,
+                                origin));
                         m_receptionTable.remove(destination);
                         nucleo.reanudarProceso(process);
                     }
@@ -215,6 +227,9 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 System.out.println("message before saving in mailbox");
                                 printBuffer(packet.getData());
                                 mailbox.saveMessage(packet.getData());
+                                m_emissionTable.put(new Integer(origin),
+                                        new MachineProcessPair(originIp,
+                                        origin));
                             }
                             else {
                                 System.out.println("buzon lleno, enviando TA");
