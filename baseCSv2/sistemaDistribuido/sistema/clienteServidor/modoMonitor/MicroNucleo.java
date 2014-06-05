@@ -14,9 +14,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleoBase;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
@@ -25,13 +28,15 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ResendThread;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ServidorNombres;
 import sistemaDistribuido.util.IntByteConverter;
-import sistemaDistribuido.util.Pausador;
 
 public final class MicroNucleo extends MicroNucleoBase {
     private static MicroNucleo nucleo = new MicroNucleo();
     private static Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
     private Hashtable<Integer, byte[]>            m_receptionTable;
     private Hashtable<Integer, RequestsMailbox>   m_mailboxesTable;
+    private LinkedList<DatosProceso> TablaDireccionamientoProcesosRemotos;
+    private LinkedList<DatosProceso> TablaDireccionamientoProcesosLocales;
+    private ProcesoCliente referenciaACliente;
 
     private MicroNucleo() {
         m_emissionTable = new Hashtable<Integer, ParMaquinaProceso>();
@@ -69,44 +74,124 @@ public final class MicroNucleo extends MicroNucleoBase {
         return true;
     }
 
-    protected void sendVerdadero(int dest, byte[] message) {
-        imprimeln("El proceso invocante es el " + super.dameIdProceso());
+    protected void sendVerdadero(int dest,byte[] message){
+        imprimeln("\nEl proceso invocante es el "+super.dameIdProceso()+"\n");
+        int idorigen = 0;
+        int iddestino = 0;
+        String ip = "";
 
-        ParMaquinaProceso pmp;
-        String ip;
-        int id;
-        
-        if (m_emissionTable.containsKey(new Integer(dest))) {
-            ip = m_emissionTable.get(new Integer(dest)).dameIP();
-            id = m_emissionTable.get(new Integer(dest)).dameID();
-        } else {
-            pmp = dameDestinatarioDesdeInterfaz();
-            ip = pmp.dameIP();
-            id = pmp.dameID();
-            imprimeln("Enviando mensaje a IP=" + ip + " ID=" + id);
+        if ( m_emissionTable.containsKey(new Integer(dest))) {
+            System.out.println("MicroNucleo se encontraron datos en " + 
+                               "Tabla de Emision");
+            ParMaquinaProceso datos;
+            datos = m_emissionTable.get( new Integer(dest)  );
+            m_emissionTable.remove(dest);
+            ip = datos.dameIP();
+            idorigen = super.dameIdProceso();
+            iddestino = dest;
+
+
+            // Envio del mensaje real
+            setOriginBytes(message, idorigen);
+            setDestinationBytes(message, iddestino);
+
+            DatagramPacket dp;
+            DatagramSocket socketEmision;
+            try
+            {
+                dp = new DatagramPacket(message,
+                        message.length, InetAddress.getByName(ip),
+                        damePuertoRecepcion() );
+                socketEmision = dameSocketEmision();
+                System.out.println("MicroNucleo se encuentran los datos en " +
+                                   "tabla emision y se hace envio");
+                socketEmision.send(dp); 
+                //socketEmision.close();
+            }
+            catch (SocketException se){
+                System.err.println("Error iniciando socket: " +
+                                    se.getMessage());
+            }
+            catch (UnknownHostException uhe){
+                System.err.println("UnknownHostException: " + uhe.getMessage());
+            }
+            catch (IOException ioe){
+                System.err.println("IOException: " + ioe.getMessage());
+            }
         }
-        imprimeln("Buscando en listas locales el par (" + ip + ", " + dest +
-                  ")");
+        else {
+            if(referenciaACliente != null && referenciaACliente.banderaSend)
+            {
+                Iterator<DatosProceso> lista =
+                        TablaDireccionamientoProcesosRemotos.iterator();
+                DatosProceso datos;
+                idorigen = super.dameIdProceso();
+                boolean banderaEncontrarServer = false;
 
-        imprime("Completando campos del encabezado del mensaje a ser enviado");
-        setOriginBytes(message, super.dameIdProceso());
-        setDestinationBytes(message, id);
+                while( lista.hasNext( ) && (banderaEncontrarServer == false) )
+                {
+                    datos = lista.next();
+                    if(  dest == datos.dameNumdeServicio()  )
+                    {
+                        System.out.println("MicroNucleo Se encontron datos " +
+                                           "en Tabla de Procesos Remotos");
+                        banderaEncontrarServer = true;
+                        iddestino = datos.dameID();
+                        ip = datos.dameIP();
+                    }
+                }
 
-        try {
-            DatagramPacket packet = new DatagramPacket(message, message.length,
-                    InetAddress.getByName(ip), nucleo.damePuertoRecepcion());
-            imprime("Enviando mensaje por la red");
-            nucleo.dameSocketEmision().send(packet);
-        } catch (UnknownHostException e) {
-            System.err.println("Error creando socket transmision: "
-                    + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("Error creando socket transmision: "
-                    + e.getMessage());
+                if(banderaEncontrarServer)
+                {
+                    // hacer el envio
+
+                    setOriginBytes(message, idorigen);
+                    setDestinationBytes(message, iddestino);
+
+                    DatagramPacket dp;
+                    DatagramSocket socketEmision;
+                    try
+                    {
+                        dp = new DatagramPacket(message,
+                                message.length, InetAddress.getByName(ip),
+                                damePuertoRecepcion());
+                        socketEmision = dameSocketEmision();
+                        System.out.println("MicroNucleo se jalan los "+
+                                "datos de la tabla procesos remotos y " +
+                                "se hace el envio");
+                        socketEmision.send(dp); 
+                    }
+                    catch(SocketException se){
+                        System.err.println("Error iniciando socket: " +
+                                se.getMessage());
+                    }
+                    catch(UnknownHostException uhe){
+                        System.err.println("UnknownHostException: " +
+                                           uhe.getMessage());
+                    }
+                    catch(IOException exce){
+                        System.err.println("IOException: "+exce.getMessage());
+                    }
+                }
+                else // No se encontro servidor en la tabla de procesos remotos
+                {
+                    HiloLadoCliente hilo;
+                    try {
+                        System.out.println("MicroNucleo se crea hilo " +
+                                "cronometro para hacer paquetes LSA");
+                        hilo = new HiloLadoCliente(idorigen,
+                                new DatagramSocket(), damePuertoRecepcion(),
+                                TablaDireccionamientoProcesosRemotos, message,
+                                this, dameProcesoLocal(super.dameIdProceso()));
+                        hilo.start();
+                    } catch (SocketException se) {
+                        se.printStackTrace();
+                    }
+                }
+            }
         }
-        
-        Pausador.pausa(2000);
     }
+
 
     protected void receiveVerdadero(int addr, byte[] message) {
         imprimeln("Recibido mensaje proviniente de la red");

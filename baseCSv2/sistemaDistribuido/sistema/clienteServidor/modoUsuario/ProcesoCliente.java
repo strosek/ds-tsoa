@@ -23,6 +23,8 @@ public class ProcesoCliente extends Proceso {
 
     private byte m_opcode;
     private String m_message;
+    public boolean banderaSend = false;
+    public String  avisodelHiloLSA = "";
 
     public ProcesoCliente(Escribano esc) {
         super(esc);

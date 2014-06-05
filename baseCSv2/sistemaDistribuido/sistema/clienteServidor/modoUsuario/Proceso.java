@@ -17,8 +17,8 @@ import sistemaDistribuido.util.Escribano;
 public abstract class Proceso extends SystemProcess {
     protected MicroNucleo nucleo;
 
-    protected byte[] m_request;
-    protected byte[] m_response;
+    public byte[] m_request;
+    public byte[] m_response;
 
     /**
 	 * 
