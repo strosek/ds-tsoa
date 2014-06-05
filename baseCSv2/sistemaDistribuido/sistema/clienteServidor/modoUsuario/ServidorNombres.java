@@ -1,8 +1,13 @@
-/**
- * Alejandro Duarte S�nchez
- * 206587844
- * Practica 5
+/*
+ * Hector Jeronimo Cuellar Villalobos 206514472.
+ * Alejandro Duarte Sanchez 206587844.
+ * Erick Daniel Corona Garcia 210224314. (D03)
+ * 
+ * TSOA D04.
+ * 
+ * Modificado para Proyecto Final.
  */
+
 package sistemaDistribuido.sistema.clienteServidor.modoUsuario;
 
 import java.util.Enumeration;

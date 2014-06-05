@@ -1,7 +1,11 @@
 /*
- * Erick Daniel Corona Garcia 210224314. TSOA D03.
+ * Hector Jeronimo Cuellar Villalobos 206514472.
+ * Alejandro Duarte Sanchez 206587844.
+ * Erick Daniel Corona Garcia 210224314. (D03)
  * 
- * Modificado para Practica 5.
+ * TSOA D04.
+ * 
+ * Modificado para Proyecto Final.
  */
 
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
@@ -146,9 +150,10 @@ public final class MicroNucleo extends MicroNucleoBase {
 
         imprimeln("Enviando mensaje de búsqueda del servidor");
         int destino = ServidorNombres.buscar(dest);
-        imprimeln("Buscando en listas locales el par (máquina, proceso) que corresponde al parámetro dest de la llamada a send");
-        if( m_emissionTable.containsKey(destino) ){
-            imprimeln("Completando campos de encabezado del mensaje a ser enviado");
+        imprimeln("Buscando en listas locales el par (máquina, proceso) que " +
+                  "corresponde al parámetro dest de la llamada a send");
+        if (m_emissionTable.containsKey(destino)) {
+            imprimeln("Completando campos de encabezado del mensaje a enviar");
 
             setOriginBytes(message, super.dameIdProceso());
             setDestinationBytes(message, destino);
@@ -157,8 +162,9 @@ public final class MicroNucleo extends MicroNucleoBase {
             m_emissionTable.remove(destino);
         }
         try {
-            
-            dp=new DatagramPacket(message,message.length,InetAddress.getByName(ip),damePuertoRecepcion());
+            dp = new DatagramPacket(message, message.length, 
+                                    InetAddress.getByName(ip),
+                                    damePuertoRecepcion());
             socketEmision=dameSocketEmision();
             imprimeln("Enviando mensaje por la red");
             socketEmision.send(dp);
@@ -169,8 +175,6 @@ public final class MicroNucleo extends MicroNucleoBase {
 
             e.printStackTrace();
         }
-        
-        //suspenderProceso();   //esta invocacion depende de si se requiere bloquear al hilo de control invocador
     }
 
     /**
