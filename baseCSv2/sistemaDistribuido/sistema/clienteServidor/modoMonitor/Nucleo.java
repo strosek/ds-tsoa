@@ -2,6 +2,7 @@ package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.ParMaquinaProceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.util.Escribano;
 import microKernelBasedSystem.system.clientServer.userMode.threadPackage.SystemThread;
 
@@ -75,5 +76,30 @@ public class Nucleo {
     public static void iniciarSistema(Escribano wri, int puertoEntrada,
             int outputPort) {
         nucleo.iniciarSistema(wri, puertoEntrada);
+    }
+
+    // Necesarios para Transmision RALA Hector Cuellar
+    public static DatosProceso levantarServidor(int servicio,String ip,int id)
+    {
+        return nucleo.registrarServidor(servicio, ip, id);
+    }
+
+    public static boolean tumbarServidor(DatosProceso datos)
+    {
+        return nucleo.derregistrarServidor(datos);
+    }
+
+    public static boolean registrarProcesoRemoto(int servicio, String ip, int id)
+    {
+        return nucleo.registrarProcesoRemoto( servicio,  ip,  id);
+    }
+
+    public static boolean eliminarDatosProcesoRemoto(int id,int servicio){
+        return nucleo.eliminarDatosProcesoRemoto( id,servicio);
+    }
+
+    public static boolean establecerCliente(ProcesoCliente cliente)
+    {
+        return nucleo.establecerCliente(cliente);
     }
 }

@@ -8,9 +8,19 @@ public class ServidorFrame extends ProcesoFrame {
     private static final long serialVersionUID = 1;
     private ProcesoServidor proc;
 
-    public ServidorFrame(MicroNucleoFrame frameNucleo) {
+    public ServidorFrame(MicroNucleoFrame frameNucleo,int alumno) {
         super(frameNucleo, "Servidor de Archivos");
-        proc = new ProcesoServidor(this);
+        switch(alumno){
+        case MicroNucleoFrame.CUELLAR_CLIENTE:
+            proc = new ProcesoServidorCuellar(this);
+            break;
+        case MicroNucleoFrame.CORONA_CLIENTE:
+            proc = new ProcesoServidorCorona(this);
+            break;
+        case MicroNucleoFrame.DUARTE_CLIENTE:
+            proc = new ProcesoServidorDuarte(this);
+            break;
+        }
         fijarProceso(proc);
     }
 }

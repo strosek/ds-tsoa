@@ -284,20 +284,57 @@ public final class MicroNucleo extends MicroNucleoBase {
         while (seguirEsperandoDatagramas()) {
             try {
                 nucleo.dameSocketRecepcion().receive(packet);
+            } catch (IOException ioe) {
+                System.err.println("Error en la recepcion del paquete: " +
+                        ioe.getMessage());
+            }
 
-                origin = getOrigin(packet.getData());
-                originIp = packet.getAddress().getHostAddress();
-                destination = getDestination(packet.getData());
+            origin = getOrigin(packet.getData());
+            originIp = packet.getAddress().getHostAddress();
+            destination = getDestination(packet.getData());
 
-                if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
+            if (packet.getData()[ProcesoServidor.INDEX_STATUS] ==
                     ProcesoServidor.STATUS_TA) {
-                    packet.getData()[ProcesoServidor.INDEX_STATUS] = 0;
+                packet.getData()[ProcesoServidor.INDEX_STATUS] = 0;
 
-                    ResendThread resender = new ResendThread(
-                            dameSocketRecepcion(), packet);
-                    resender.start();
+                ResendThread resender = new ResendThread(
+                        dameSocketRecepcion(), packet);
+                resender.start();
+            }
+            else if (packet.getData()[ProcesoServidor.INDEX_STATUS] == 
+                     ProcesoServidor.STATUS_LSA)
+            {
+                System.out.println("MicroNucleo obtiene un paquete LSA y lo empieza a tratar");
+                int numServicio = IntByteConverter.toInt((Arrays.copyOfRange(buffer,  10, 14)));
+                Iterator<DatosProceso> lista = TablaDireccionamientoProcesosLocales.iterator();
+                boolean banderaEncontrarServer = false;
+                DatosProceso datos;
+                String ipServer;
+                int idServer = 0;
+
+
+                while( lista.hasNext( ) && (banderaEncontrarServer == false) )
+                {
+                    datos = lista.next();
+                    if(  248 == datos.dameNumdeServicio()  )
+                    {
+                        System.out.println("MicroNucleo se encontraron datos en tabla de procesos locales");
+                        banderaEncontrarServer = true;
+                        idServer = datos.dameID();
+                        ipServer = datos.dameIP();
+                    }
+
                 }
-
+                if(banderaEncontrarServer)
+                {// Enviar FSA
+                    System.out.println("MicroNucleo se prepara un FSA");
+                    HiloLadoServidorFSA hiloFSA = new HiloLadoServidorFSA (
+                            dameSocketEmision(), damePuertoRecepcion(),
+                            origin, idServer);
+                    hiloFSA.start();
+                }
+            }
+            else {
                 imprimeln("Buscando proceso correspondiente al campo recibido");
                 process = nucleo.dameProcesoLocal(destination);
 
@@ -310,13 +347,13 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 array.length);
                         m_emissionTable.put(new Integer(origin),
                                 new MachineProcessPair(originIp,
-                                origin));
+                                        origin));
                         m_receptionTable.remove(destination);
                         nucleo.reanudarProceso(process);
                     }
                     else {
                         if (m_mailboxesTable.containsKey(
-                            nucleo.dameIdProceso(process))) {
+                                nucleo.dameIdProceso(process))) {
                             RequestsMailbox mailbox = m_mailboxesTable.get(
                                     nucleo.dameIdProceso(process));
                             if (mailbox.hasSpace()) {
@@ -324,11 +361,11 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 mailbox.saveMessage(packet.getData());
                                 m_emissionTable.put(new Integer(origin),
                                         new MachineProcessPair(originIp,
-                                        origin));
+                                                origin));
                             }
                             else {
                                 imprimeln("Proceso distinatario ocupado, " + 
-                                          "enviando TA");
+                                        "enviando TA");
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 
@@ -336,32 +373,41 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 setOriginBytes(buffer, destination);
                                 setDestinationBytes(buffer, origin);
 
-                                packet = new DatagramPacket(buffer,
-                                        buffer.length,
-                                        InetAddress.getByName(originIp),
-                                        nucleo.damePuertoRecepcion());
-                                nucleo.dameSocketEmision().send(packet);
+                                try {
+                                    packet = new DatagramPacket(buffer,
+                                            buffer.length,
+                                            InetAddress.getByName(originIp),
+                                            nucleo.damePuertoRecepcion());
+                                    nucleo.dameSocketEmision().send(packet);
+                                } catch (UnknownHostException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
                 }
                 else {
                     imprimeln("Proceso distinatario no encontrado segun el " +
-                              "campo dest recibido");
+                            "campo dest recibido");
                     buffer[ProcesoServidor.INDEX_STATUS] =
                             (byte)ProcesoServidor.STATUS_AU;
 
                     setOriginBytes(buffer, destination);
                     setDestinationBytes(buffer, origin);
 
-                    packet = new DatagramPacket(buffer, buffer.length,
-                            InetAddress.getByName(originIp),
-                            nucleo.damePuertoRecepcion());
-                    nucleo.dameSocketEmision().send(packet);
+                    try {
+                        packet = new DatagramPacket(buffer, buffer.length,
+                                InetAddress.getByName(originIp),
+                                nucleo.damePuertoRecepcion());
+                        nucleo.dameSocketEmision().send(packet);
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } catch (IOException ioe) {
-                System.err.println("Error en la recepcion del paquete: " +
-                                   ioe.getMessage());
             }
         }
     }
@@ -432,5 +478,47 @@ public final class MicroNucleo extends MicroNucleoBase {
         }
         System.out.println("ST: " + buffer[ProcesoServidor.SIZE_PACKET - 1]);
         System.out.println();
+    }
+
+    public DatosProceso registrarServidor(int servicio, String ip, int id)
+    {
+        DatosProceso datos = new DatosProceso(servicio,ip,id);
+        TablaDireccionamientoProcesosLocales.add(datos);
+        return datos;
+    }
+
+    public boolean derregistrarServidor(DatosProceso datos)
+    {
+        TablaDireccionamientoProcesosLocales.remove(datos);
+        return true;
+    }
+
+    public boolean registrarProcesoRemoto(int servicio, String ip, int id)
+    {
+        DatosProceso datos = new DatosProceso(servicio,ip,id);
+        TablaDireccionamientoProcesosRemotos.add(datos);
+        return true;
+    }
+
+    public boolean eliminarDatosProcesoRemoto(int id,int servicio){
+        DatosProceso datos;
+        for(int i=0; i < TablaDireccionamientoProcesosRemotos.size(); i++)
+        {
+            datos = TablaDireccionamientoProcesosRemotos.get(i);
+            if( (datos.dameID() == id) && (datos.dameNumdeServicio() == servicio))
+            {
+                TablaDireccionamientoProcesosRemotos.remove(datos);
+                return true;
+            }
+            
+        }
+
+        return false;
+    }
+
+    public boolean establecerCliente(ProcesoCliente cliente)
+    {
+        referenciaACliente = cliente;
+        return true;
     }
 }

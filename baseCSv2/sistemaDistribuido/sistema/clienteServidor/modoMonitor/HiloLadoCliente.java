@@ -21,7 +21,9 @@ public class HiloLadoCliente  extends Thread{
     MicroNucleo nucleo;
     ProcesoCliente cliente;
 
-    public HiloLadoCliente( int idorigen, DatagramSocket socket,int puerto,LinkedList<DatosProceso> tabla,byte [] mensajeOriginal,MicroNucleo nucleo,Proceso cliente)
+    public HiloLadoCliente(int idorigen, DatagramSocket socket,
+            int puerto, LinkedList<DatosProceso> tabla, byte [] mensajeOriginal,
+            MicroNucleo nucleo,Proceso cliente)
     {
         this.idorigen = idorigen;
         socketEmision = socket;
@@ -36,12 +38,10 @@ public class HiloLadoCliente  extends Thread{
     {
         byte [] messageLSA = new byte[1024];
         DatagramPacket paqueteLSA;
-        short codigoLSA = -2;
+        byte codigoLSA = -2;
         byte arrayAux[] = new byte[4];
 
-        messageLSA[8] = (byte)codigoLSA;
-        codigoLSA >>=8;
-        messageLSA[9]= (byte)codigoLSA;
+        messageLSA[9]= codigoLSA;
 
         nucleo.setOriginBytes(messageLSA, idorigen);
         nucleo.setDestinationBytes(messageLSA, 0);
@@ -49,7 +49,7 @@ public class HiloLadoCliente  extends Thread{
         arrayAux = IntByteConverter.toBytes(248);
         for (int i =0; i<4; i++)// segundo campo es el receptor
         {
-            messageLSA[i + 1020]= arrayAux[i];
+            messageLSA[ProcesoServidor.INDEX_SERVICE + i]= arrayAux[i];
         }
 
         Iterator<DatosProceso> lista;
@@ -61,14 +61,13 @@ public class HiloLadoCliente  extends Thread{
         int oportunidad = 0;
         while((oportunidad < 3) && (banderaEncontrarServer == false))
         {
-
             try {
-                paqueteLSA = new DatagramPacket(messageLSA,messageLSA.length,InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()),puerto);
-                //socketEmision = dameSocketEmision();
+                paqueteLSA = new DatagramPacket(messageLSA, messageLSA.length,
+                        InetAddress.getByName(
+                        InetAddress.getLocalHost().getHostAddress()),
+                        puerto);
                 System.out.println("HILO CLIENTE mensaje LSA enviado a la red");
                 socketEmision.send(paqueteLSA);
-                //socketEmision.close();
-
             } 
             catch (UnknownHostException e)
             {
@@ -96,14 +95,15 @@ public class HiloLadoCliente  extends Thread{
                 datos = lista.next();
                 if(  248 == datos.dameNumdeServicio()  )
                 {
-                    System.out.println("HILO CLIENTE se encotraron datos en tabla de procesos remotos despues de los envios LSA");
+                    System.out.println("HILO CLIENTE se encotraron datos en " +
+                            "tabla de procesos remotos despues de los " +
+                            "envios LSA");
                     banderaEncontrarServer = true;
                     iddestino = datos.dameID();
                     ip = datos.dameIP();
-                    //break;// salir del while es lo que quiero
                 }
-
             }
+
             if(banderaEncontrarServer)
             {
                 //hacer envio de la solicitud al server
@@ -111,22 +111,26 @@ public class HiloLadoCliente  extends Thread{
                 nucleo.setDestinationBytes(mensajeCliente, iddestino);
 
                 DatagramPacket dp;
-                //DatagramSocket socketEmision;
                 try
                 {
-                    dp = new DatagramPacket(mensajeCliente,mensajeCliente.length,InetAddress.getByName(ip),puerto );
-                    System.out.println("HILO CLIENTE  se jalan los datos de la tabla procesos remotos y se hace el envio se obtuvieron gracias a los LSA");
+                    dp = new DatagramPacket(mensajeCliente,
+                            mensajeCliente.length,
+                            InetAddress.getByName(ip), puerto);
+                    System.out.println("HILO CLIENTE  se jalan los datos de " +
+                            "la tabla procesos remotos y se hace el envio se" +
+                            "obtuvieron gracias a los LSA");
                     socketEmision.send(dp); 
-                    //socketEmision.close();
                 }
                 catch(SocketException exce){
-                    //System.out.println("Error iniciando socket: "+exce.getMessage());
+                    System.err.println("Error iniciando socket: "+
+                                       exce.getMessage());
                 }
                 catch(UnknownHostException exce){
-                    //System.out.println("UnknownHostException: "+exce.getMessage());
+                    System.err.println("UnknownHostException: "+
+                                       exce.getMessage());
                 }
                 catch(IOException exce){
-                    //System.out.println("IOException: "+exce.getMessage());
+                    System.err.println("IOException: "+exce.getMessage());
                 }
             }
             else
@@ -139,13 +143,13 @@ public class HiloLadoCliente  extends Thread{
         }//fin de while de tres oportunidades de 5 sec.
 
 
-        //AQUI HACER UNA CONDICION SI SE ENCONTRO O NO UN SERVER SI
+        // AQUI HACER UNA CONDICION SI SE ENCONTRO O NO UN SERVER SI
         // NO SE ENCONTRO NINGUN SERVER
-        //TENEMOS QUE DESPERTAR AL CLIENTE AVISANDOLE QUE NO ENCONTRAMOS A NINGUN
-        // PINCHE SERVIDOR QUE PROSESARA SUS CHINGADERAS QUE QUIERE
+        // TENEMOS QUE DESPERTAR AL CLIENTE AVISANDOLE QUE NO HAY SERVIDOR
         if(banderaEncontrarServer == false)
         {
-            cliente.avisodelHiloLSA = "POR EL MOMENTO NO SE ENCUENTRAN SERVIDORES INTENTA EN OTRO MOMENTO";
+            cliente.avisodelHiloLSA = "POR EL MOMENTO NO SE ENCUENTRAN " +
+                                      "SERVIDORES INTENTA EN OTRO MOMENTO";
             cliente.m_response[8] = 0;
             cliente.m_response[9] = 0;
             nucleo.reanudarProceso(cliente);
@@ -164,10 +168,6 @@ public class HiloLadoCliente  extends Thread{
         numero >>=8;
         array[3]= (byte)numero;
 
-        // System.out.println(array[0]+" "+array[1]+" "+array[2]+" "+array[3]);
-
         return array;
     }
-
-
 }

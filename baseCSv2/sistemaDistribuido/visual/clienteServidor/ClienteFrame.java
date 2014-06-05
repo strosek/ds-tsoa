@@ -25,11 +25,23 @@ public class ClienteFrame extends ProcesoFrame {
     private Button botonSolicitud;
     private String codop1, codop2, codop3, codop4;
 
-    public ClienteFrame(MicroNucleoFrame frameNucleo) {
+    public ClienteFrame(MicroNucleoFrame frameNucleo, int alumno) {
         super(frameNucleo, "Cliente de Archivos");
         add("South", construirPanelSolicitud());
         validate();
-        proc = new ProcesoCliente(this);
+        
+        switch(alumno){
+        case MicroNucleoFrame.CUELLAR_CLIENTE:
+            proc = new ProcesoClienteCuellar(this);
+            break;
+        case MicroNucleoFrame.CORONA_CLIENTE:
+            proc = new ProcesoClienteCorona(this);
+            break;
+        case MicroNucleoFrame.DUARTE_CLIENTE:
+            proc = new ProcesoClienteDuarte(this);
+            break;
+        }
+        
         fijarProceso(proc);
     }
 

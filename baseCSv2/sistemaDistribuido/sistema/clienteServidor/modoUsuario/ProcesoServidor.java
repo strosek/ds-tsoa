@@ -21,19 +21,22 @@ import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
 public class ProcesoServidor extends Proceso {
     public static final int INDEX_STATUS =      9;
-    public static final int INDEX_MESSLENGTH = 10;
-    public static final int INDEX_MESSAGE =    11;
+    public static final int INDEX_SERVICE =    10; // +4 more bytes
+    public static final int INDEX_MESSLENGTH = 15;
+    public static final int INDEX_MESSAGE =    16;
 
-    public static final int STATUS_SUC_READ = 0;
-    public static final int STATUS_SUC_WRITE = 1;
+    public static final int STATUS_SUC_READ =   0;
+    public static final int STATUS_SUC_WRITE =  1;
     public static final int STATUS_SUC_CREATE = 2;
     public static final int STATUS_SUC_DELETE = 3;
-    public static final int STATUS_ERR_READ = 4;
-    public static final int STATUS_ERR_WRITE = 5;
+    public static final int STATUS_ERR_READ =   4;
+    public static final int STATUS_ERR_WRITE =  5;
     public static final int STATUS_ERR_CREATE = 6;
     public static final int STATUS_ERR_DELETE = 7;
-    public static final int STATUS_AU = 8;
-    public static final int STATUS_TA = 9;
+    public static final int STATUS_AU =  -1;
+    public static final int STATUS_LSA = -2;
+    public static final int STATUS_FSA = -3;
+    public static final int STATUS_TA =  -4;
 
     public static final int SIZE_PACKET = 1024;
 
