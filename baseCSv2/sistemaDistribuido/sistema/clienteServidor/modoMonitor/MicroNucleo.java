@@ -8,6 +8,7 @@ package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -18,12 +19,13 @@ import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoServidor;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ResendThread;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ServidorNombres;
 import sistemaDistribuido.util.IntByteConverter;
 import sistemaDistribuido.util.Pausador;
 
 public final class MicroNucleo extends MicroNucleoBase {
     private static MicroNucleo nucleo = new MicroNucleo();
-    private Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
+    private static Hashtable<Integer, ParMaquinaProceso> m_emissionTable;
     private Hashtable<Integer, byte[]>            m_receptionTable;
     private Hashtable<Integer, RequestsMailbox>   m_mailboxesTable;
 
@@ -69,7 +71,7 @@ public final class MicroNucleo extends MicroNucleoBase {
         ParMaquinaProceso pmp;
         String ip;
         int id;
-
+        
         if (m_emissionTable.containsKey(new Integer(dest))) {
             ip = m_emissionTable.get(new Integer(dest)).dameIP();
             id = m_emissionTable.get(new Integer(dest)).dameID();
@@ -136,6 +138,39 @@ public final class MicroNucleo extends MicroNucleoBase {
      * practica 5
      */
     protected void sendVerdadero(String dest, byte[] message) {
+        DatagramPacket dp;
+        DatagramSocket socketEmision;
+        String ip = new String();
+
+        imprimeln("El proceso invocante es el "+super.dameIdProceso());
+
+        imprimeln("Enviando mensaje de búsqueda del servidor");
+        int destino = ServidorNombres.buscar(dest);
+        imprimeln("Buscando en listas locales el par (máquina, proceso) que corresponde al parámetro dest de la llamada a send");
+        if( m_emissionTable.containsKey(destino) ){
+            imprimeln("Completando campos de encabezado del mensaje a ser enviado");
+
+            setOriginBytes(message, super.dameIdProceso());
+            setDestinationBytes(message, destino);
+            ip = m_emissionTable.get(destino).dameIP();
+            imprimeln("Enviando mensaje a IP="+ip+" ID="+dameIdProceso());
+            m_emissionTable.remove(destino);
+        }
+        try {
+            
+            dp=new DatagramPacket(message,message.length,InetAddress.getByName(ip),damePuertoRecepcion());
+            socketEmision=dameSocketEmision();
+            imprimeln("Enviando mensaje por la red");
+            socketEmision.send(dp);
+        } catch (UnknownHostException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+        
+        //suspenderProceso();   //esta invocacion depende de si se requiere bloquear al hilo de control invocador
     }
 
     /**
@@ -176,7 +211,7 @@ public final class MicroNucleo extends MicroNucleoBase {
 
                 imprimeln("Buscando proceso correspondiente al campo recibido");
                 process = nucleo.dameProcesoLocal(destination);
-                
+
                 if (process != null) {
                     if (m_receptionTable.containsKey(destination)) {
                         byte[] array = m_receptionTable.get(destination);
@@ -208,7 +243,7 @@ public final class MicroNucleo extends MicroNucleoBase {
                                 buffer[ProcesoServidor.INDEX_STATUS] = 
                                         (byte)ProcesoServidor.STATUS_TA;
 
-                                // TODO: define if this is necessary.
+                                // TODO: define if this inversion is necessary.
                                 setOriginBytes(buffer, destination);
                                 setDestinationBytes(buffer, origin);
 
@@ -242,8 +277,10 @@ public final class MicroNucleo extends MicroNucleoBase {
         }
     }
 
-    public void registrarParMaquinaProceso(ParMaquinaProceso server) {
+    public static int registrarParMaquinaProceso(ParMaquinaProceso server) {
         m_emissionTable.put(server.dameID(), server);
+
+        return server.dameID();
     }
 
     private RequestsMailbox getRequestsMailbox(int pid) {
