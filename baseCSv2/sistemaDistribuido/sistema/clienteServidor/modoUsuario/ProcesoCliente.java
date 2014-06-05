@@ -14,8 +14,8 @@ public class ProcesoCliente extends Proceso {
     public static final int INDEX_ORIGIN = 0;
     public static final int INDEX_DESTINATION = 4;
     public static final int INDEX_OPCODE = 8;
-    public static final int INDEX_MESSAGELENGTH = 9;
-    public static final int INDEX_MESSAGE = 10;
+    public static final int INDEX_MESSAGELENGTH = ProcesoServidor.INDEX_MESSLENGTH;
+    public static final int INDEX_MESSAGE = ProcesoServidor.INDEX_MESSAGE;
 
     public static final int SIZE_PACKET = 1024;
 

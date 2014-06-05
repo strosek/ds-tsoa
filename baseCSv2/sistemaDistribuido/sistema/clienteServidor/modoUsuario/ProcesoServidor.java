@@ -21,9 +21,9 @@ import sistemaDistribuido.util.Pausador;
 import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
 
 public class ProcesoServidor extends Proceso {
-    public static final int INDEX_STATUS = 1023;
-    public static final int INDEX_MESSLENGTH = 9;
-    public static final int INDEX_MESSAGE = 10;
+    public static final int INDEX_STATUS =      9;
+    public static final int INDEX_MESSLENGTH = 10;
+    public static final int INDEX_MESSAGE =    11;
 
     public static final int STATUS_SUC_READ = 0;
     public static final int STATUS_SUC_WRITE = 1;
