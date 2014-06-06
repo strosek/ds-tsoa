@@ -1,9 +1,13 @@
 package sistemaDistribuido.visual.clienteServidor;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
-import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ProcesoCliente;
 import sistemaDistribuido.visual.clienteServidor.MicroNucleoFrame;
 import sistemaDistribuido.visual.clienteServidor.ProcesoFrame;
+
+import corona.ProcesoClienteCorona;
+import cuellar.ProcesoClienteCuellar;
+import duarte.ProcesoClienteDuarte;
+
 import java.awt.Label;
 import java.awt.TextField;
 import java.awt.Choice;
@@ -19,12 +23,16 @@ public class ClienteFrame extends ProcesoFrame {
     public static final int CODOP_WRITE = 3;
 
     private static final long serialVersionUID = 1;
-    private ProcesoCliente proc;
+  
     private Choice codigosOperacion;
     private TextField campoMensaje;
     private Button botonSolicitud;
     private String codop1, codop2, codop3, codop4;
-
+    
+    private ProcesoClienteCuellar procCuellar;
+    private ProcesoClienteCorona procCorona;
+    private ProcesoClienteDuarte procDuarte;
+    
     public ClienteFrame(MicroNucleoFrame frameNucleo, int alumno) {
         super(frameNucleo, "Cliente de Archivos");
         add("South", construirPanelSolicitud());
@@ -32,17 +40,19 @@ public class ClienteFrame extends ProcesoFrame {
         
         switch(alumno){
         case MicroNucleoFrame.CUELLAR_CLIENTE:
-            proc = new ProcesoClienteCuellar(this);
+        	procCuellar = new ProcesoClienteCuellar(this,botonSolicitud);//TODO como lo solucionas?
+            fijarProceso(procCuellar);
             break;
         case MicroNucleoFrame.CORONA_CLIENTE:
-            proc = new ProcesoClienteCorona(this);
+        	procCorona = new ProcesoClienteCorona(this);
+            fijarProceso(procCorona);
             break;
         case MicroNucleoFrame.DUARTE_CLIENTE:
-            proc = new ProcesoClienteDuarte(this);
+        	procDuarte = new ProcesoClienteDuarte(this);
+            fijarProceso(procDuarte);
             break;
         }
-        
-        fijarProceso(proc);
+    
     }
 
     public Panel construirPanelSolicitud() {
@@ -74,10 +84,10 @@ public class ClienteFrame extends ProcesoFrame {
                 botonSolicitud.setEnabled(false);
                 com = codigosOperacion.getSelectedItem();
                 imprimeln("Solicitud a enviar: " + com);
-                proc.setCodop(codigosOperacion.getSelectedIndex());
+                procCorona.setCodop(codigosOperacion.getSelectedIndex());//TODO Este codigo es de erick. adaptar el de cada uno para sus metodos
                 imprimeln("Mensaje a enviar: " + campoMensaje.getText());
-                proc.setMessage(campoMensaje.getText());
-                Nucleo.reanudarProceso(proc);
+                procCorona.setMessage(campoMensaje.getText());//TODO Este codigo es de erick. adaptar el de cada uno para sus metodos
+                Nucleo.reanudarProceso(procCorona);//TODO Este codigo es de erick. adaptar el de cada uno para sus metodos
             }
         }
     }
