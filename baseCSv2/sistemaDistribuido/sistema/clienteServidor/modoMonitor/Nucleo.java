@@ -98,7 +98,7 @@ public class Nucleo {
         return nucleo.eliminarDatosProcesoRemoto( id,servicio);
     }
 
-    public static boolean establecerCliente(ProcesoCliente cliente)
+    public static boolean establecerCliente(Proceso cliente)
     {
         return nucleo.establecerCliente(cliente);
     }

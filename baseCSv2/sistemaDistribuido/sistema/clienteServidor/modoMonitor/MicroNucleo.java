@@ -36,7 +36,7 @@ public final class MicroNucleo extends MicroNucleoBase {
     private Hashtable<Integer, RequestsMailbox>   m_mailboxesTable;
     private LinkedList<DatosProceso> TablaDireccionamientoProcesosRemotos;
     private LinkedList<DatosProceso> TablaDireccionamientoProcesosLocales;
-    private ProcesoCliente referenciaACliente;
+    private Proceso referenciaACliente;
 
     private MicroNucleo() {
         m_emissionTable = new Hashtable<Integer, ParMaquinaProceso>();
@@ -106,7 +106,6 @@ public final class MicroNucleo extends MicroNucleoBase {
                 System.out.println("MicroNucleo se encuentran los datos en " +
                                    "tabla emision y se hace envio");
                 socketEmision.send(dp); 
-                //socketEmision.close();
             }
             catch (SocketException se){
                 System.err.println("Error iniciando socket: " +
@@ -516,7 +515,7 @@ public final class MicroNucleo extends MicroNucleoBase {
         return false;
     }
 
-    public boolean establecerCliente(ProcesoCliente cliente)
+    public boolean establecerCliente(Proceso cliente)
     {
         referenciaACliente = cliente;
         return true;

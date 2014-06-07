@@ -11,18 +11,13 @@ import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleo;
 import sistemaDistribuido.util.Escribano;
 
-/**
- * 
- */
 public abstract class Proceso extends SystemProcess {
     protected MicroNucleo nucleo;
 
     public byte[] m_request;
     public byte[] m_response;
+    public boolean banderaSend;
 
-    /**
-	 * 
-	 */
     public Proceso(Escribano esc) {
         super(Nucleo.nucleo, esc);
         this.nucleo = Nucleo.nucleo;
