@@ -37,9 +37,11 @@ public class ClienteFrame extends ProcesoFrame {
         super(frameNucleo, "Cliente de Archivos");
         add("South", construirPanelSolicitud());
         validate();
-        
+        System.out.println(alumno);
         switch(alumno){
+        
         case MicroNucleoFrame.CUELLAR_CLIENTE:
+        	
         	procCuellar = new ProcesoClienteCuellar(this,botonSolicitud);
             fijarProceso(procCuellar);
             break;
@@ -94,11 +96,13 @@ public class ClienteFrame extends ProcesoFrame {
 	            	imprimeln("Solicitud a enviar: "+com);
 					imprimeln("Mensaje a enviar: "+campoMensaje.getText());
 					procCuellar.capturarSolicitud(com,campoMensaje.getText());
+					Nucleo.reanudarProceso(procCorona);
 	            }
 	            else if( procDuarte != null ){
 					imprimeln("Solicitud a enviar: "+com);
 					imprimeln("Mensaje a enviar: "+campoMensaje.getText());
 					procDuarte.entradaInterfaz(codigosOperacion.getSelectedIndex(), campoMensaje.getText());
+					Nucleo.reanudarProceso(procCorona);
 	            }
             }
         }
