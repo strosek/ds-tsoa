@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MachineProcessPair;
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ServidorNombres;
@@ -54,6 +55,7 @@ public class ProcesoServidorDuarte extends Proceso{
         String param1 = null,param2=null;
         boolean band = false;
         int tam,cont=0,cont2=0;
+        int destino, origen;
 
         MachineProcessPair asa = null;
         try {
@@ -68,7 +70,7 @@ public class ProcesoServidorDuarte extends Proceso{
             dato = -1;
             imprimeln("Invocando a receive()");
             Nucleo.receive(dameID(),solServidor);
-
+            MicroNucleo.printBuffer(solServidor);
             dato=solServidor[9];
 
             tam = (int)solServidor[10]+11;
@@ -185,17 +187,19 @@ public class ProcesoServidorDuarte extends Proceso{
                 respuesta = "Peticion invalida";
                 break;
             }
+            Pausador.pausa(3000);
             imprimeln("Generando mensaje a ser enviado, llenando los campos necesarios");
             respByte = respuesta.getBytes();
             respServidor[8] = (byte)respuesta.length();
             for( int i = 9 , j = 0; i < respuesta.length()+9 ; i++  , j++){
                 respServidor[i] = respByte[j];
             }
-            Pausador.pausa(1000);  //sin esta l�nea es posible que Servidor solicite send antes que Cliente solicite receive
-            imprimeln("enviando respuesta");
-            imprimeln("Se�alamiento al n�cleo para env�o de mensaje");
 
-            Nucleo.send(solServidor[0],respServidor);
+            Pausador.pausa(1000);  //sin esta linea es posible que Servidor solicite send antes que Cliente solicite receive
+            imprimeln("enviando respuesta");
+            imprimeln("Senalamiento al nucleo para envio de mensaje");
+            MicroNucleo.printBuffer(respServidor);
+            Nucleo.send(solServidor[3], respServidor);
         }
         ServidorNombres.baja("Servidor",id);
     }
