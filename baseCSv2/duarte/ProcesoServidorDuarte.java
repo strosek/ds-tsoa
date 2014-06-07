@@ -54,6 +54,7 @@ public class ProcesoServidorDuarte extends Proceso{
         String param1 = null,param2=null;
         boolean band = false;
         int tam,cont=0,cont2=0;
+        int destino, origen;
 
         MachineProcessPair asa = null;
         try {
@@ -185,6 +186,7 @@ public class ProcesoServidorDuarte extends Proceso{
                 respuesta = "Peticion invalida";
                 break;
             }
+            Pausador.pausa(3000);
             imprimeln("Generando mensaje a ser enviado, llenando los campos necesarios");
             respByte = respuesta.getBytes();
             respServidor[8] = (byte)respuesta.length();
@@ -194,6 +196,11 @@ public class ProcesoServidorDuarte extends Proceso{
             Pausador.pausa(1000);  //sin esta l�nea es posible que Servidor solicite send antes que Cliente solicite receive
             imprimeln("enviando respuesta");
             imprimeln("Se�alamiento al n�cleo para env�o de mensaje");
+            origen = solServidor[0];
+            destino = solServidor[4];
+            Nucleo.nucleo.setOriginBytes(respServidor, destino);
+            
+            Nucleo.nucleo.setDestinationBytes(respServidor, origen);
 
             Nucleo.send(solServidor[0],respServidor);
         }
