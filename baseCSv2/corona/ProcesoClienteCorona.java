@@ -19,8 +19,6 @@ public class ProcesoClienteCorona extends Proceso {
 
     public static final int SIZE_PACKET = 1024;
 
-    private static final int PID_DEFAULT_DESTINY = 248;
-
     private byte m_opcode;
     private String m_message;
     public boolean banderaSend = false;

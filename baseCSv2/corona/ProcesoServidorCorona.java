@@ -65,12 +65,13 @@ public class ProcesoServidorCorona extends Proceso {
         imprimeln("Agregando buzon");
         Nucleo.nucleo.addNewMailbox(dameID());
         MachineProcessPair asa = null;
-		try {
-			asa = new MachineProcessPair(InetAddress.getLocalHost().getHostAddress(),dameID());
-		} catch (UnknownHostException e1) {
-		
-			e1.printStackTrace();
-		}
+
+        try {
+            asa = new MachineProcessPair(InetAddress.getLocalHost().getHostAddress(),dameID());
+        } catch (UnknownHostException uhe) {
+            uhe.printStackTrace();
+        }
+
         int id = ServidorNombres.alta("ServidorCorona", asa);
         
         while (continuar()) {
