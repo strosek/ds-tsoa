@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MachineProcessPair;
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MicroNucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ServidorNombres;
@@ -69,7 +70,7 @@ public class ProcesoServidorDuarte extends Proceso{
             dato = -1;
             imprimeln("Invocando a receive()");
             Nucleo.receive(dameID(),solServidor);
-
+            MicroNucleo.printBuffer(solServidor);
             dato=solServidor[9];
 
             tam = (int)solServidor[10]+11;
@@ -196,12 +197,12 @@ public class ProcesoServidorDuarte extends Proceso{
             Pausador.pausa(1000);  //sin esta l�nea es posible que Servidor solicite send antes que Cliente solicite receive
             imprimeln("enviando respuesta");
             imprimeln("Se�alamiento al n�cleo para env�o de mensaje");
-            origen = solServidor[0];
-            destino = solServidor[4];
+            origen = solServidor[3];
+            destino = solServidor[7];
             Nucleo.nucleo.setOriginBytes(respServidor, destino);
             
             Nucleo.nucleo.setDestinationBytes(respServidor, origen);
-
+            MicroNucleo.printBuffer(respServidor);
             Nucleo.send(solServidor[0],respServidor);
         }
         ServidorNombres.baja("Servidor",id);
