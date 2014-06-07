@@ -9,6 +9,7 @@ import java.awt.Button;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
+import sistemaDistribuido.util.IntByteConverter;
 
 /**
  * Hector Jeronimo Cuellar Villalobos
@@ -143,15 +144,8 @@ public class ProcesoClienteCuellar extends Proceso{
         numeroenEnBytes[1] = paquete[9];
         tamMensaje = construyeShort(numeroenEnBytes);
 
-        if(tamMensaje == -1)
-        {
-            System.out.println("Cliente el cliente recivio un AU");
-            int ultimoIdProcesoQueSeLeEnvioSolicitud = construyeInt(Arrays.copyOfRange(paquete,  0, 4));
-            System.out.println("Cliente el cliente recivio un AU del PROCESO "+ ultimoIdProcesoQueSeLeEnvioSolicitud);
-            Nucleo.eliminarDatosProcesoRemoto(ultimoIdProcesoQueSeLeEnvioSolicitud,248);
-            return "AU";
-        }
-        else
+       
+        
             if(tamMensaje == -3) // se recibio un FSA
             {
                 System.out.println("Cliente el cliente recivio un FSA");
@@ -169,6 +163,16 @@ public class ProcesoClienteCuellar extends Proceso{
                 return "FSA";
             }
             else
+            	 if( paquete[9] == -1 )
+                 {
+                     System.out.println("Cliente el cliente recivio un AU");
+                     //int ultimoIdProcesoQueSeLeEnvioSolicitud = construyeInt(Arrays.copyOfRange(paquete,  0, 4));
+                     int ultimoIdProcesoQueSeLeEnvioSolicitud = IntByteConverter.toInt(Arrays.copyOfRange(paquete,  0, 4));
+                     System.out.println("Cliente el cliente recivio un AU del PROCESO "+ ultimoIdProcesoQueSeLeEnvioSolicitud);
+                     Nucleo.eliminarDatosProcesoRemoto(ultimoIdProcesoQueSeLeEnvioSolicitud,248);
+                     return "AU";
+                 }
+            	 else
             {
                 System.out.println("Cliente el cliente recivio un mensaje normal");
                 for(int i=0,j=10; i<tamMensaje; i++,j++)

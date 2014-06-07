@@ -331,7 +331,7 @@ public final class MicroNucleo extends MicroNucleoBase {
                     System.out.println("MicroNucleo se prepara un FSA");
                     HiloLadoServidorFSA hiloFSA = new HiloLadoServidorFSA (
                             dameSocketEmision(), damePuertoRecepcion(),
-                            origin, idServer);
+                            origin, idServer,this);
                     hiloFSA.start();
                 }
             }
@@ -390,10 +390,14 @@ public final class MicroNucleo extends MicroNucleoBase {
                     }
                 }
                 else {
+                	
+                	System.out.println("ADRRESS UNKNOWN  TRATARLO");
                     imprimeln("Proceso distinatario no encontrado segun el " +
                             "campo dest recibido");
                     buffer[ProcesoServidor.INDEX_STATUS] =
                             (byte)ProcesoServidor.STATUS_AU;
+                    
+                    System.out.println("Address unknown a "+origin);
 
                     setOriginBytes(buffer, destination);
                     setDestinationBytes(buffer, origin);

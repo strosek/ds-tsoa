@@ -96,13 +96,13 @@ public class ClienteFrame extends ProcesoFrame {
 	            	imprimeln("Solicitud a enviar: "+com);
 					imprimeln("Mensaje a enviar: "+campoMensaje.getText());
 					procCuellar.capturarSolicitud(com,campoMensaje.getText());
-					Nucleo.reanudarProceso(procCorona);
+					Nucleo.reanudarProceso(procCuellar);
 	            }
 	            else if( procDuarte != null ){
 					imprimeln("Solicitud a enviar: "+com);
 					imprimeln("Mensaje a enviar: "+campoMensaje.getText());
 					procDuarte.entradaInterfaz(codigosOperacion.getSelectedIndex(), campoMensaje.getText());
-					Nucleo.reanudarProceso(procCorona);
+					Nucleo.reanudarProceso(procDuarte);
 	            }
             }
         }
