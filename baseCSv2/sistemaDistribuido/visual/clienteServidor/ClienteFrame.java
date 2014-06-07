@@ -40,7 +40,7 @@ public class ClienteFrame extends ProcesoFrame {
         
         switch(alumno){
         case MicroNucleoFrame.CUELLAR_CLIENTE:
-        	procCuellar = new ProcesoClienteCuellar(this,botonSolicitud);//TODO como lo solucionas?
+        	procCuellar = new ProcesoClienteCuellar(this,botonSolicitud);
             fijarProceso(procCuellar);
             break;
         case MicroNucleoFrame.CORONA_CLIENTE:
@@ -84,10 +84,22 @@ public class ClienteFrame extends ProcesoFrame {
                 botonSolicitud.setEnabled(false);
                 com = codigosOperacion.getSelectedItem();
                 imprimeln("Solicitud a enviar: " + com);
-                procCorona.setCodop(codigosOperacion.getSelectedIndex());//TODO Este codigo es de erick. adaptar el de cada uno para sus metodos
-                imprimeln("Mensaje a enviar: " + campoMensaje.getText());
-                procCorona.setMessage(campoMensaje.getText());//TODO Este codigo es de erick. adaptar el de cada uno para sus metodos
-                Nucleo.reanudarProceso(procCorona);//TODO Este codigo es de erick. adaptar el de cada uno para sus metodos
+                if( procCorona != null ){
+                	procCorona.setCodop(codigosOperacion.getSelectedIndex());
+                    imprimeln("Mensaje a enviar: " + campoMensaje.getText());
+                    procCorona.setMessage(campoMensaje.getText());
+                    Nucleo.reanudarProceso(procCorona);
+                }
+	            else if( procCuellar != null ){
+	            	imprimeln("Solicitud a enviar: "+com);
+					imprimeln("Mensaje a enviar: "+campoMensaje.getText());
+					procCuellar.capturarSolicitud(com,campoMensaje.getText());
+	            }
+	            else if( procDuarte != null ){
+					imprimeln("Solicitud a enviar: "+com);
+					imprimeln("Mensaje a enviar: "+campoMensaje.getText());
+					procDuarte.entradaInterfaz(codigosOperacion.getSelectedIndex(), campoMensaje.getText());
+	            }
             }
         }
     }
