@@ -37,6 +37,9 @@ public class ProcesoServidorCuellar extends Proceso{
         //byte dato;
         String mensajeDeLaRed;
 
+        imprimeln("Agregando buzon");
+        Nucleo.nucleo.addNewMailbox(dameID());
+
         try {
             ip = InetAddress.getLocalHost().getHostAddress();	 
         } catch (UnknownHostException e) {
@@ -46,12 +49,10 @@ public class ProcesoServidorCuellar extends Proceso{
         DatosProceso misdatos= Nucleo.levantarServidor(248, ip , dameID());
 
         while(continuar()){
-
             imprimeln("Se convoco a receive()");
             Nucleo.receive(dameID(),solServidor);
             mensajeDeLaRed = desempaquetarMensaje(solServidor);
             
-            //Arrays.copyOfRange(solServidor,  0, 4)
             origen = IntByteConverter.toInt(Arrays.copyOfRange(solServidor,  0, 4));
             
             System.out.println("El servidor enviara al numero "+origen);
