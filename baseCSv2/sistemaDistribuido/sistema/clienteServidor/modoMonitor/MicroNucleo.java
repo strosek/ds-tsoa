@@ -42,6 +42,8 @@ public final class MicroNucleo extends MicroNucleoBase {
         m_emissionTable = new Hashtable<Integer, ParMaquinaProceso>();
         m_receptionTable = new Hashtable<Integer, byte[]>();
         m_mailboxesTable = new Hashtable<Integer, RequestsMailbox>();
+        TablaDireccionamientoProcesosLocales = new LinkedList<DatosProceso>();
+        TablaDireccionamientoProcesosRemotos = new LinkedList<DatosProceso>();
     }
 
     public final static MicroNucleo obtenerMicroNucleo() {

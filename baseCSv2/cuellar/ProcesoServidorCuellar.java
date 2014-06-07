@@ -51,7 +51,6 @@ public class ProcesoServidorCuellar extends Proceso{
             mensajeDeLaRed = desempaquetarMensaje(solServidor);
 
             origen = construyeInt(Arrays.copyOfRange(solServidor,  0, 4));
-            destino = construyeInt(Arrays.copyOfRange(solServidor,  4, 8));
 
             switch(solServidor[9])
             {

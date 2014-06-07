@@ -35,7 +35,6 @@ public class ProcesoClienteCuellar extends Proceso{
     {
         codop = operacion;
         mensaje = datos;
-
     }
 
     public void run(){
