@@ -194,16 +194,12 @@ public class ProcesoServidorDuarte extends Proceso{
             for( int i = 9 , j = 0; i < respuesta.length()+9 ; i++  , j++){
                 respServidor[i] = respByte[j];
             }
-            Pausador.pausa(1000);  //sin esta l�nea es posible que Servidor solicite send antes que Cliente solicite receive
+
+            Pausador.pausa(1000);  //sin esta linea es posible que Servidor solicite send antes que Cliente solicite receive
             imprimeln("enviando respuesta");
-            imprimeln("Se�alamiento al n�cleo para env�o de mensaje");
-            origen = solServidor[3];
-            destino = solServidor[7];
-            Nucleo.nucleo.setOriginBytes(respServidor, destino);
-            
-            Nucleo.nucleo.setDestinationBytes(respServidor, origen);
+            imprimeln("Senalamiento al nucleo para envio de mensaje");
             MicroNucleo.printBuffer(respServidor);
-            Nucleo.send(solServidor[0],respServidor);
+            Nucleo.send(solServidor[3], respServidor);
         }
         ServidorNombres.baja("Servidor",id);
     }
