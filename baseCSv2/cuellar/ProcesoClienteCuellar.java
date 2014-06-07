@@ -50,6 +50,7 @@ public class ProcesoClienteCuellar extends Proceso{
             imprimeln("Enviando mensaje");
 
             System.out.println("Cliente convoca a send");
+              
             Nucleo.establecerCliente(this);
             banderaSend = true;
             Nucleo.send(248,solCliente);
@@ -162,6 +163,7 @@ public class ProcesoClienteCuellar extends Proceso{
                 } catch (UnknownHostException e) {
 
                 }
+                System.out.println("FSA num"+idServer);
 
                 Nucleo.registrarProcesoRemoto(248, ip, idServer);
                 return "FSA";

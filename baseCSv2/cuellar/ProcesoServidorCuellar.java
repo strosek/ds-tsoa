@@ -5,6 +5,7 @@ import sistemaDistribuido.sistema.clienteServidor.modoMonitor.DatosProceso;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.GestionArchivo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
 import sistemaDistribuido.util.Escribano;
+import sistemaDistribuido.util.IntByteConverter;
 import sistemaDistribuido.util.Pausador;
 
 import java.io.File;
@@ -49,8 +50,11 @@ public class ProcesoServidorCuellar extends Proceso{
             imprimeln("Se convoco a receive()");
             Nucleo.receive(dameID(),solServidor);
             mensajeDeLaRed = desempaquetarMensaje(solServidor);
-
-            origen = construyeInt(Arrays.copyOfRange(solServidor,  0, 4));
+            
+            //Arrays.copyOfRange(solServidor,  0, 4)
+            origen = IntByteConverter.toInt(Arrays.copyOfRange(solServidor,  0, 4));
+            
+            System.out.println("El servidor enviara al numero "+origen);
 
             switch(solServidor[9])
             {

@@ -12,14 +12,15 @@ public class HiloLadoServidorFSA extends Thread{
 	int puerto;
 	int destino;// es a donde va el FSA
 	int idServer;
+	MicroNucleo nucleo;
 	
-	public HiloLadoServidorFSA(DatagramSocket socket,int puerto,int destino,int idServer)
+	public HiloLadoServidorFSA(DatagramSocket socket,int puerto,int destino,int idServer,MicroNucleo nucleo)
 	{
 		socketEmision = socket;
 		this.puerto = puerto;
 		this.destino = destino;// es a donde va el FSA
 		this.idServer = idServer;
-		
+		this.nucleo = nucleo;
 		
 	}
 	
@@ -35,16 +36,10 @@ public class HiloLadoServidorFSA extends Thread{
 		codigoFSA >>=8;
         messageFSA[9]= (byte)codigoFSA;
         
-        arrayAux = empaquetaEntero(0); //tenia destino
-		for(int i =0; i<4; i++)// primer campo es el emisor
-		{
-			messageFSA[i]= arrayAux[i];
-		}
-		arrayAux = empaquetaEntero(destino);//tenia origen
-		for(int i =0; i<4; i++)// segundo campo es el receptor
-		{
-			messageFSA[i+4]= arrayAux[i];
-		}
+        nucleo.setOriginBytes(messageFSA, 0);
+        nucleo.setDestinationBytes(messageFSA, destino);
+        
+
 		arrayAux = empaquetaEntero(248);
 		for(int i =0; i<4; i++)
 		{
@@ -69,6 +64,10 @@ public class HiloLadoServidorFSA extends Thread{
 		
 	    
 		// quisas sea necesario dormir aqui unos milisegundos
+		for(int i=0; i < 12; i++)
+		{
+			System.out.print(messageFSA[i]+" " );
+		}
 		try
 		{
 			

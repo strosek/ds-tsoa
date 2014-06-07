@@ -1,6 +1,8 @@
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
-import sistemaDistribuido.sistema.clienteServidor.modoUsuario.*;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
+import cuellar.ProcesoClienteCuellar;
+import corona.ProcesoServidorCorona;
 import sistemaDistribuido.util.IntByteConverter;
 
 import java.io.IOException;
@@ -19,7 +21,7 @@ public class HiloLadoCliente  extends Thread{
     byte [] mensajeCliente = new byte[1024];
     LinkedList<DatosProceso> TablaProcesosRemotos;
     MicroNucleo nucleo;
-    ProcesoCliente cliente;
+    ProcesoClienteCuellar cliente;
 
     public HiloLadoCliente(int idorigen, DatagramSocket socket,
             int puerto, LinkedList<DatosProceso> tabla, byte [] mensajeOriginal,
@@ -31,7 +33,7 @@ public class HiloLadoCliente  extends Thread{
         TablaProcesosRemotos = tabla;
         System.arraycopy(mensajeOriginal, 0, mensajeCliente, 0, mensajeCliente.length);
         this.nucleo = nucleo;
-        this.cliente =  (ProcesoCliente) cliente;
+        this.cliente =  (ProcesoClienteCuellar) cliente;
     }
 
     public void run()
@@ -49,7 +51,7 @@ public class HiloLadoCliente  extends Thread{
         arrayAux = IntByteConverter.toBytes(248);
         for (int i =0; i<4; i++)// segundo campo es el receptor
         {
-            messageLSA[ProcesoServidor.INDEX_SERVICE + i]= arrayAux[i];
+            messageLSA[ProcesoServidorCorona.INDEX_SERVICE + i]= arrayAux[i];
         }
 
         Iterator<DatosProceso> lista;
@@ -150,8 +152,8 @@ public class HiloLadoCliente  extends Thread{
         {
             cliente.avisodelHiloLSA = "POR EL MOMENTO NO SE ENCUENTRAN " +
                                       "SERVIDORES INTENTA EN OTRO MOMENTO";
-            cliente.m_response[8] = 0;
-            cliente.m_response[9] = 0;
+            cliente.respCliente[8] = 0;
+            cliente.respCliente[9] = 0;
             nucleo.reanudarProceso(cliente);
         }
     }
