@@ -14,16 +14,16 @@ public class ServidorFrame extends ProcesoFrame {
     public ServidorFrame(MicroNucleoFrame frameNucleo,int alumno) {
         super(frameNucleo, "Servidor de Archivos");
         switch(alumno){
-        case MicroNucleoFrame.CUELLAR_CLIENTE:
+        case MicroNucleoFrame.CUELLAR_SERVIDOR:
             proc1 = new ProcesoServidorCuellar(this);
             fijarProceso(proc1);
             break;
-        case MicroNucleoFrame.CORONA_CLIENTE:
+        case MicroNucleoFrame.CORONA_SERVIDOR:
         	
         	proc2 = new ProcesoServidorCorona(this);
             fijarProceso(proc2);
             break;
-        case MicroNucleoFrame.DUARTE_CLIENTE:
+        case MicroNucleoFrame.DUARTE_SERVIDOR:
         	
             proc3 = new ProcesoServidorDuarte(this);
             fijarProceso(proc3);
