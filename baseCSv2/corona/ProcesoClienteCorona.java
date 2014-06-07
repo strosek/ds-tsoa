@@ -57,7 +57,7 @@ public class ProcesoClienteCorona extends Proceso {
         packMessage();
 
         imprimeln("Senhalamiento al nucleo para envio de mensaje...");
-        Nucleo.send(PID_DEFAULT_DESTINY, m_request);
+        Nucleo.send("ServidorCorona", m_request);
 
         imprimeln("Invocando a receive...");
         Nucleo.receive(dameID(), m_response);

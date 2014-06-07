@@ -12,9 +12,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
+import sistemaDistribuido.sistema.clienteServidor.modoMonitor.MachineProcessPair;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
+import sistemaDistribuido.sistema.clienteServidor.modoUsuario.ServidorNombres;
 import sistemaDistribuido.util.Escribano;
 import sistemaDistribuido.util.Pausador;
 import sistemaDistribuido.visual.clienteServidor.ClienteFrame;
@@ -60,7 +64,15 @@ public class ProcesoServidorCorona extends Proceso {
 
         imprimeln("Agregando buzon");
         Nucleo.nucleo.addNewMailbox(dameID());
-
+        MachineProcessPair asa = null;
+		try {
+			asa = new MachineProcessPair(InetAddress.getLocalHost().getHostAddress(),dameID());
+		} catch (UnknownHostException e1) {
+		
+			e1.printStackTrace();
+		}
+        int id = ServidorNombres.alta("ServidorCorona", asa);
+        
         while (continuar()) {
             imprimeln("Invocando a receive...");
             Nucleo.receive(dameID(), m_request);
@@ -115,6 +127,7 @@ public class ProcesoServidorCorona extends Proceso {
 
             Nucleo.send(origin, m_response);
         }
+        ServidorNombres.baja("Servidor",id);
     }
 
     private void createFile() {
