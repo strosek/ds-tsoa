@@ -135,7 +135,7 @@ public class ProcesoServidorCuellar extends Proceso{
             }
 
 
-            Pausador.pausa(1000);  //sin esta l�nea es posible que Servidor solicite send antes que Cliente solicite receive
+            Pausador.pausa(5000);  //sin esta l�nea es posible que Servidor solicite send antes que Cliente solicite receive
             imprimeln("enviando respuesta");
             //Nucleo.send(0,respServidor);
             Nucleo.send(origen,respServidor);
