@@ -22,8 +22,10 @@ public class ResendThread extends Thread {
 
     public void run() {
         try {
+            System.out.println("Antes de reenviar paquete por la red...");
             sleep(5000);
             m_socket.send(m_packet);
+            System.out.println("Despues de reenviar paquete por la red...");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } catch (InterruptedException ie) {
