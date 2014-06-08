@@ -4,7 +4,7 @@
  * Modificado para Practica 5.
  */
 
-package corona;
+package sistemaDistribuido.corona;
 
 import java.io.BufferedReader;
 import java.io.File;

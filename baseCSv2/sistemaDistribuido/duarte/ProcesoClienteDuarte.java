@@ -1,9 +1,9 @@
 /**
- * Alejandro Duarte Sánchez
+ * Alejandro Duarte Sï¿½nchez
  * 206587844
  * Practica 1 y 5
  */
-package duarte;
+package sistemaDistribuido.duarte;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
@@ -55,7 +55,7 @@ public class ProcesoClienteDuarte extends Proceso {
 			solCliente[i] =  temp[j];
 		}
 		
-		imprimeln("Señalamiento al núcleo para envío de mensaje");
+		imprimeln("Seï¿½alamiento al nï¿½cleo para envï¿½o de mensaje");
 		Nucleo.send("Servidor", solCliente);
 		imprimeln("Invocando a receive()");
 		Nucleo.receive(dameID(), respCliente);
@@ -64,6 +64,6 @@ public class ProcesoClienteDuarte extends Proceso {
 		for( int i = 9 , j = 0; i < tam+9 ; i++  , j++){
 			respuesta[j]= (char)respCliente[i];
 		}
-		imprimeln("el servidor me envió un :" + String.copyValueOf(respuesta));
+		imprimeln("el servidor me enviï¿½ un :" + String.copyValueOf(respuesta));
 	}
 }

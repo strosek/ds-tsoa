@@ -3,7 +3,7 @@
  * 206587844
  * Practica 1 y 2 y 5
  */
-package duarte;
+package sistemaDistribuido.duarte;
 
 import java.io.BufferedReader;
 import java.io.File;

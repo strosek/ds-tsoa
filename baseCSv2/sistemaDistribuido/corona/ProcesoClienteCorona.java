@@ -4,7 +4,7 @@
  * Modificado para Practica 5.
  */
 
-package corona;
+package sistemaDistribuido.corona;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;

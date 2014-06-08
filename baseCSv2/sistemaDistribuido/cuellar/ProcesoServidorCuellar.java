@@ -1,4 +1,4 @@
-package cuellar;
+package sistemaDistribuido.cuellar;
 
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.DatosProceso;

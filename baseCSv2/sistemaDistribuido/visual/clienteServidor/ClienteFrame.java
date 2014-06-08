@@ -1,12 +1,11 @@
 package sistemaDistribuido.visual.clienteServidor;
 
+import sistemaDistribuido.corona.ProcesoClienteCorona;
+import sistemaDistribuido.cuellar.ProcesoClienteCuellar;
+import sistemaDistribuido.duarte.ProcesoClienteDuarte;
 import sistemaDistribuido.sistema.clienteServidor.modoMonitor.Nucleo;
 import sistemaDistribuido.visual.clienteServidor.MicroNucleoFrame;
 import sistemaDistribuido.visual.clienteServidor.ProcesoFrame;
-
-import corona.ProcesoClienteCorona;
-import cuellar.ProcesoClienteCuellar;
-import duarte.ProcesoClienteDuarte;
 
 import java.awt.Label;
 import java.awt.TextField;

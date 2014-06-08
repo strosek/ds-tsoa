@@ -1,4 +1,4 @@
-package cuellar;
+package sistemaDistribuido.cuellar;
 
 // esta es una prueba de git hub
 import java.net.InetAddress;

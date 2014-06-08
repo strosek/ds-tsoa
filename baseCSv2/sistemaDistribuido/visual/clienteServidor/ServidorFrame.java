@@ -1,8 +1,8 @@
 package sistemaDistribuido.visual.clienteServidor;
 
-import corona.ProcesoServidorCorona;
-import cuellar.ProcesoServidorCuellar;
-import duarte.ProcesoServidorDuarte;
+import sistemaDistribuido.corona.ProcesoServidorCorona;
+import sistemaDistribuido.cuellar.ProcesoServidorCuellar;
+import sistemaDistribuido.duarte.ProcesoServidorDuarte;
 import sistemaDistribuido.visual.clienteServidor.MicroNucleoFrame;
 import sistemaDistribuido.visual.clienteServidor.ProcesoFrame;
 

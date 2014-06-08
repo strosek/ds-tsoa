@@ -1,8 +1,8 @@
 package sistemaDistribuido.sistema.clienteServidor.modoMonitor;
 
+import sistemaDistribuido.corona.ProcesoServidorCorona;
+import sistemaDistribuido.cuellar.ProcesoClienteCuellar;
 import sistemaDistribuido.sistema.clienteServidor.modoUsuario.Proceso;
-import cuellar.ProcesoClienteCuellar;
-import corona.ProcesoServidorCorona;
 import sistemaDistribuido.util.IntByteConverter;
 
 import java.io.IOException;
